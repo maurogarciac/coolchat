@@ -1,6 +1,6 @@
 [project]
-name = "automation_test4"
-description = "A pytest ui/api test automation framework concept"
+name = "automation"
+description = "A pytest ui/api test automation framework for CoolChat"
 readme = "README.md"
 authors = [
     { name = "Mauro Garcia Coto" },
