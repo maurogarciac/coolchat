@@ -22,18 +22,16 @@ func NewLogoutHandler(logger *zap.SugaredLogger) *LogoutHandler {
 func (h LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	name := "logout"
-	c := templates.Home()
+	c := templates.Home() // make logout template
 
 	switch r.Method {
 
 	case http.MethodGet:
 
-		// should check headers to see if user has an access token and redirect to either home or login
+		// are you sure you want to logout??? with 2 buttons
+		// if yes, redirect to login
 
 		pageRender(name, c, h.lg, w, r)
-
-	case http.MethodPost:
-		// Should check cookies for jwt
 
 	default:
 		fmt.Fprintf(w, "only get and post methods are supported")
