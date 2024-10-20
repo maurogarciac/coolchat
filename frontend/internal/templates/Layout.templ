@@ -1,0 +1,34 @@
+package templates
+
+templ Layout(content templ.Component){
+    <!DOCTYPE html>
+    <html lang="es">
+        @PageHeaders()
+
+        <body hx-history="false" hx-boost="true" hx-push-url="true">
+
+            <!-- Navigation bar -->
+
+            <div id="nav">
+
+                <a href="#main" class="skip-to-main-content-link">Skip to main content</a>
+
+                @NavButton("/home/",  "Home")
+                @NavButton("/chat/",  "Chat App")
+
+                @NavButton("/", "Log in")
+                @NavButton("/logout/",  "Log out")
+
+            </div>
+
+            <!-- Page content -->
+
+            <div id="main">
+
+                @content
+
+            </div>
+
+        </body>
+    </html>
+}

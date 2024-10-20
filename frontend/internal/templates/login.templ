@@ -1,0 +1,20 @@
+package templates
+
+templ LogIn() {
+<h1> Welcome to CoolChat 😎 </h1> 
+
+<div id="login">
+    <h2>Sign in</h2>
+    <form onsubmit="return false" hx-post="/login">
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required></input>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required></input>
+
+        <input type="submit" value="Log in"></input>
+
+    </form>
+</div>
+}

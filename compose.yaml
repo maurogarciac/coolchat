@@ -1,0 +1,46 @@
+
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_DB=login
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    healthcheck:
+      test: pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      interval: 2s
+      retries: 10
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: backend/Dockerfile
+  #   command: go run backend/cmd/backend/main.go 0.0.0.0:1337
+  #   volumes: 
+  #     - .:/backend
+  #   ports:
+  #     - "1337:1337"
+  #   restart: unless-stopped
+  web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    command: go run frontend/cmd/frontend/main.go 0.0.0.0:$${PORT}
+    volumes:
+      - .:/frontend
+    environment:
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      # backend:
+      #   condition: service_healthy
+
+volumes:
+  postgres_data:
+    

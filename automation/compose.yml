@@ -1,0 +1,13 @@
+name: wdp-login-tests
+services:
+  run:
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./reports:/wdp-login-tests/reports
+    command:
+      - pytest
+    env_file:
+      - .env.docker

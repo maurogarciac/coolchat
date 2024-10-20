@@ -1,0 +1,11 @@
+# Check pip-tools's docs: https://pip-tools.readthedocs.io/en/latest/cli/pip-compile/
+
+ruff
+selenium
+pip-tools
+pytest
+pytest-asyncio
+pytest-bdd
+pytest-html
+python-dotenv
+webdriver-manager
