@@ -18,6 +18,11 @@ install:
 vet:
 	go vet $(PACKAGES)
 
+## debug: run the server in debug mode
+.PHONY: debug
+debug:
+	go run cmd/frontend/main.go
+
 ## start: run the server
 .PHONY: start
 start:

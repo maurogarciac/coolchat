@@ -9,6 +9,7 @@ import (
 
 	"frontend/config"
 	"frontend/internal/handlers"
+	m "frontend/internal/middleware"
 	"frontend/internal/services"
 
 	"go.uber.org/zap"
@@ -47,9 +48,9 @@ func (s *HTTPServer) Start(ctx context.Context) {
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	http.Handle("/", handlers.NewLoginHandler(ctx, s.lg, s.b))
-	http.Handle("/home/", handlers.NewHomeHandler(s.lg))
-	http.Handle("/chat/", handlers.NewChatHandler(s.lg))
-	http.Handle("/logout/", handlers.NewLogoutHandler(s.lg))
+	http.Handle("/home/", m.JWTMiddleware(handlers.NewHomeHandler(s.lg)))
+	http.Handle("/chat/", m.JWTMiddleware(handlers.NewChatHandler(ctx, s.lg)))
+	http.Handle("/logout/", m.JWTMiddleware(handlers.NewLogoutHandler(s.lg)))
 
 	err := s.server.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {

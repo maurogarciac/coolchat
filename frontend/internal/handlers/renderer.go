@@ -20,7 +20,7 @@ func pageRender(templateName string, c templ.Component, lg *zap.SugaredLogger, w
 			http.Error(w, "Error rendering partial template", http.StatusInternalServerError)
 			return
 		} else {
-			lg.Infof("partial %s template rendered", templateName)
+			lg.Debugf("partial %s template rendered", templateName)
 		}
 	} else {
 		err := templates.Layout(c).Render(r.Context(), w) // Render full page
@@ -29,7 +29,7 @@ func pageRender(templateName string, c templ.Component, lg *zap.SugaredLogger, w
 			http.Error(w, "Error rendering full template", http.StatusInternalServerError)
 			return
 		} else {
-			lg.Infof("%s template rendered", templateName)
+			lg.Debugf("%s template rendered", templateName)
 		}
 	}
 

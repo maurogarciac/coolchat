@@ -2,17 +2,19 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 const (
-	AccessTokenCookieName  = "access-token"
-	JwtSecretKey           = "super-secure-access-token"
-	RefreshTokenCookieName = "refresh-token"
-	JwtRefreshSecretKey    = "super-secure-secret-key"
+	// Secrets should be in env variables
+	AccessTokenCookieName  = "access_token"
+	JwtSecretKey           = "Bs2S9WLytsE8nPjIMzbd3FgE6VAVODTh" // These have to be 256 bit bytestring
+	RefreshTokenCookieName = "refresh_token"
+	JwtRefreshSecretKey    = "hWJH1THzDv03eYjIswvqz6cSqKnpuKrw"
 )
 
 type Claims struct {
@@ -23,15 +25,20 @@ type Claims struct {
 // Middleware to validate JWT Access Tokens
 func JWTMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract token from the Authorization header
-		tokenString := r.Header.Get("Authorization")
-		if tokenString == "" {
-			http.Error(w, "Missing token", http.StatusUnauthorized)
+		// Extract access token from cookies
+		accessToken := ""
+		for _, cookie := range r.Cookies() {
+			if cookie.Name == AccessTokenCookieName {
+				accessToken = cookie.Value
+			}
+		}
+		if accessToken == "" {
+			http.Error(w, "Missing access token", http.StatusUnauthorized)
 			return
 		}
 
 		// Parse and validate the token
-		claims, err := verifyAccessToken(tokenString)
+		claims, err := verifyAccessToken(accessToken)
 		if err != nil {
 			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
 			return
@@ -39,7 +46,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 
 		// You can set the username or other claims in the request context if needed
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, "username", claims.Username)
+		ctx = context.WithValue(ctx, "User", claims.Username)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
@@ -49,7 +56,7 @@ func verifyAccessToken(tokenStr string) (*Claims, error) {
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return JwtSecretKey, nil
+		return []byte(JwtSecretKey), nil
 	})
 	if err != nil || !token.Valid {
 		return nil, err
@@ -59,9 +66,15 @@ func verifyAccessToken(tokenStr string) (*Claims, error) {
 
 // Refresh the Access Token using the Refresh Token
 func RefreshAccessToken(w http.ResponseWriter, r *http.Request) {
-	refreshToken := r.URL.Query().Get("refresh_token")
+
+	refreshToken := ""
+	for _, cookie := range r.Cookies() {
+		if cookie.Name == RefreshTokenCookieName {
+			refreshToken = cookie.Value
+		}
+	}
 	if refreshToken == "" {
-		http.Error(w, "Refresh token required", http.StatusUnauthorized)
+		http.Error(w, "Missing refresh token", http.StatusUnauthorized)
 		return
 	}
 
@@ -79,7 +92,6 @@ func RefreshAccessToken(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Verify Refresh Token
 func verifyRefreshToken(tokenStr string) (*Claims, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
@@ -91,8 +103,9 @@ func verifyRefreshToken(tokenStr string) (*Claims, error) {
 	return claims, nil
 }
 
-// Generate Access and Refresh Tokens
+// Generate new Access and Refresh Tokens
 func GenerateTokens(username string, w http.ResponseWriter) error {
+
 	// Access Token (15 minutes expiration)
 	accessExp := time.Now().Add(15 * time.Minute)
 	accessClaims := &Claims{
@@ -102,9 +115,9 @@ func GenerateTokens(username string, w http.ResponseWriter) error {
 		},
 	}
 
-	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString(JwtSecretKey)
+	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accessClaims).SignedString([]byte(JwtSecretKey))
 	if err != nil {
-		return err
+		return fmt.Errorf("access token generation error: %w", err)
 	}
 
 	setTokenCookie(AccessTokenCookieName, accessToken, accessExp, w)
@@ -117,9 +130,9 @@ func GenerateTokens(username string, w http.ResponseWriter) error {
 			ExpiresAt: jwt.NewNumericDate(refreshExp),
 		},
 	}
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString(JwtRefreshSecretKey)
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(JwtRefreshSecretKey))
 	if err != nil {
-		return err
+		return fmt.Errorf("refresh token generation error: %w", err)
 	}
 	setTokenCookie(RefreshTokenCookieName, refreshToken, refreshExp, w)
 
@@ -133,6 +146,7 @@ func setTokenCookie(name string, token string, expiration time.Time, w http.Resp
 	cookie.Expires = expiration
 	cookie.Path = "/"
 	cookie.HttpOnly = true
+	cookie.SameSite = 0
 
 	http.SetCookie(w, cookie)
 }

@@ -5,6 +5,7 @@ go 1.23
 require (
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/go-chi/chi/v5 v5.1.0
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/hashicorp/go-retryablehttp v0.7.5
 	go.uber.org/zap v1.27.0
 )

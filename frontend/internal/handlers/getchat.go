@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 
@@ -10,18 +11,25 @@ import (
 )
 
 type ChatHandler struct {
-	lg *zap.SugaredLogger
+	ctx context.Context
+	lg  *zap.SugaredLogger
 }
 
-func NewChatHandler(logger *zap.SugaredLogger) *ChatHandler {
+func NewChatHandler(context context.Context, logger *zap.SugaredLogger) *ChatHandler {
 	return &ChatHandler{
-		lg: logger,
+		ctx: context,
+		lg:  logger,
 	}
 }
 
 func (h ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	c := templates.ChatBox()
+	user, ok := h.ctx.Value("User").(string)
+	if !ok {
+		h.lg.Error("Could not fetch username from context")
+	}
+
+	c := templates.ChatBox(user)
 
 	switch r.Method {
 
