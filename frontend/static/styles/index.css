@@ -160,6 +160,27 @@ body {
         font-size: 24px;
         color: #fff;
     }
+
+    button {
+        width: 100%;
+        padding: 15px;
+        background-color: #314db3;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 20px;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    button:active {
+        background-color: #003f88;
+    }
 }
 
 #login-wrapper {
@@ -193,27 +214,6 @@ body {
 #login input[type="password"]:focus {
     outline: none;
     border-color: #888;
-}
-
-#login, #logout button {
-    width: 100%;
-    padding: 15px;
-    background-color: #314db3;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 18px;
-    margin-top: 20px;
-    transition: background-color 0.3s ease;
-}
-
-#login, #logout button:hover {
-    background-color: #0056b3;
-}
-
-#login, #logout button:active {
-    background-color: #003f88;
 }
 
 #login input::placeholder {

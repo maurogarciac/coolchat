@@ -5,7 +5,7 @@ templ LogOut() {
     <h1> Log out </h1>
     <h2> Are you sure you want log out? </h2>
     <div>
-        <button hx-get="/chat?partial=true" hx-trigger="click" hx-target="#main" hx-swap="innerHTML">No, I want to chat</button>
+        <button hx-push-url="/chat/" hx-get="/chat?partial=true" hx-trigger="click" hx-target="#main" hx-swap="innerHTML">No, I want to chat</button>
 
         <button hx-post="/logout" hx-trigger="click" hx-target="#main" hx-swap="innerHTML">Yes</button>
     </div>

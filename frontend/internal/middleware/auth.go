@@ -38,7 +38,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 		}
 
 		// Parse and validate the token
-		claims, err := verifyAccessToken(accessToken)
+		claims, err := VerifyAccessToken(accessToken)
 		if err != nil {
 			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
 			return
@@ -52,7 +52,7 @@ func JWTMiddleware(next http.Handler) http.Handler {
 }
 
 // Verifies the Access Token
-func verifyAccessToken(tokenStr string) (*Claims, error) {
+func VerifyAccessToken(tokenStr string) (*Claims, error) {
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {

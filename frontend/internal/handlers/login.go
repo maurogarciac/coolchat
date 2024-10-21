@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"frontend/internal/domain"
-	"frontend/internal/middleware"
+	auth "frontend/internal/middleware"
 	"frontend/internal/services"
 	"frontend/internal/templates"
 
@@ -32,9 +32,21 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 
-		// should check headers to see if user has an access token and redirect to home page
+		accessToken := ""
+		for _, cookie := range r.Cookies() {
+			if cookie.Name == auth.AccessTokenCookieName {
+				accessToken = cookie.Value
+			}
+		}
 
-		pageRender("login", c, false, h.lg, w, r)
+		_, err := auth.VerifyAccessToken(accessToken)
+		if err != nil {
+			pageRender("login", c, false, h.lg, w, r)
+			return
+		}
+		if err == nil {
+			http.Redirect(w, r, "/home/", http.StatusMovedPermanently)
+		}
 
 	case http.MethodPost:
 
@@ -80,7 +92,7 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		accepted := false
 		for _, u := range users {
 			if u.Username == login_creds.Username && u.Password == login_creds.Password {
-				err := middleware.GenerateTokens(u.Username, w) // Generate JWT tokens in a cookie for the user
+				err := auth.GenerateTokens(u.Username, w) // Generate JWT tokens in a cookie for the user
 				if err != nil {
 					h.lg.Error("Token generation error: ", err)
 					http.Error(w, "Could not generate tokens for the user", http.StatusInternalServerError)

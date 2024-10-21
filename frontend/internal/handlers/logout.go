@@ -36,12 +36,11 @@ func (h LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		deleteTokenCookie(middleware.AccessTokenCookieName, w)
 		deleteTokenCookie(middleware.RefreshTokenCookieName, w)
 
-		http.Redirect(w, r, "/login", http.StatusPermanentRedirect)
+		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
 
 	default:
 		fmt.Fprintf(w, "only get and post methods are supported")
 		return
-
 	}
 }
 
@@ -51,6 +50,7 @@ func deleteTokenCookie(name string, w http.ResponseWriter) {
 		Name:     name,
 		Value:    "",
 		Path:     "/",
+		MaxAge:   -1,
 		Expires:  time.Unix(0, 0),
 		HttpOnly: true,
 		SameSite: 0,
