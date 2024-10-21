@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -11,20 +10,18 @@ import (
 )
 
 type ChatHandler struct {
-	ctx context.Context
-	lg  *zap.SugaredLogger
+	lg *zap.SugaredLogger
 }
 
-func NewChatHandler(context context.Context, logger *zap.SugaredLogger) *ChatHandler {
+func NewChatHandler(logger *zap.SugaredLogger) *ChatHandler {
 	return &ChatHandler{
-		ctx: context,
-		lg:  logger,
+		lg: logger,
 	}
 }
 
 func (h ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	user, ok := h.ctx.Value("User").(string)
+	user, ok := r.Context().Value("User").(string)
 	if !ok {
 		h.lg.Error("Could not fetch username from context")
 	}
@@ -37,7 +34,7 @@ func (h ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// should check headers to see if user has an access token
 
-		pageRender("chat", c, h.lg, w, r)
+		pageRender("chat", c, true, h.lg, w, r)
 
 	default:
 		fmt.Fprintf(w, "only get method is supported")

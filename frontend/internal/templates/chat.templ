@@ -1,13 +1,13 @@
 package templates
 
-templ ChatBox(user string) {
+templ ChatBox(username string) {
 
 <div id="chat">
     <h2> CoolChat 😎 </h2>
     <div id="chatbox-wrapper" hx-ext="ws,ws-html-response" ws-connect="ws://localhost:1337/ws" ws-target="#chatbox" hx-on:htmx:ws-after-message="document.querySelector('#form').reset()">
         <div id="chatbox"></div>
         <form id="form" hx-trigger="submit" ws-send>
-            <input type="text" name="message" autocomplete="off" placeholder="Nothing to say?"></input>
+            <input type="text" name="message" autocomplete="off" placeholder={"Got something to say, " + username + "?"}></input>
             <input type="submit" value="Send"></input>
         </form>
     </div>

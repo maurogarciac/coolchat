@@ -1,25 +1,17 @@
 package templates
 
-templ Layout(content templ.Component){
+templ Layout(content templ.Component, hasToken bool){
     <!DOCTYPE html>
     <html lang="es">
         @PageHeaders()
 
         <body hx-history="false" hx-boost="true" hx-push-url="true">
 
+            <a href="#main" class="skip-to-main-content-link">Skip to main content</a>
+
             <!-- Navigation bar -->
 
-            <div id="nav">
-
-                <a href="#main" class="skip-to-main-content-link">Skip to main content</a>
-
-                @NavButton("/home/",  "Home")
-                @NavButton("/chat/",  "Chat App")
-
-                @NavButton("/", "Log in")
-                @NavButton("/logout/",  "Log out")
-
-            </div>
+            @NavBar(hasToken)
 
             <!-- Page content -->
 

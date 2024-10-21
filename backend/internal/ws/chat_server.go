@@ -107,7 +107,7 @@ func (s *ChatServer) broadcastMessage(message []byte, user string) error {
 	outgoingEvent.Message = string(data)
 
 	for client := range s.clients {
-		client.egress <- outgoingEvent // broadcast to all the clients' egress
+		client.egress <- outgoingEvent // broadcast to egress of all clients
 	}
 	return nil
 }

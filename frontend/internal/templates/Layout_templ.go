@@ -10,7 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-func Layout(content templ.Component) templ.Component {
+func Layout(content templ.Component, hasToken bool) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -31,27 +31,15 @@ func Layout(content templ.Component) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body hx-history=\"false\" hx-boost=\"true\" hx-push-url=\"true\"><!-- Navigation bar --><div id=\"nav\"><a href=\"#main\" class=\"skip-to-main-content-link\">Skip to main content</a>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<body hx-history=\"false\" hx-boost=\"true\" hx-push-url=\"true\"><a href=\"#main\" class=\"skip-to-main-content-link\">Skip to main content</a><!-- Navigation bar -->")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = NavButton("/home/", "Home").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = NavBar(hasToken).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = NavButton("/chat/", "Chat App").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = NavButton("/", "Log in").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = NavButton("/logout/", "Log out").Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</div><!-- Page content --><div id=\"main\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<!-- Page content --><div id=\"main\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

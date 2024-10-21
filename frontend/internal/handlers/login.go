@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -14,16 +13,14 @@ import (
 )
 
 type LoginHandler struct {
-	ctx context.Context
-	lg  *zap.SugaredLogger
-	b   *services.BackendService
+	lg *zap.SugaredLogger
+	b  *services.BackendService
 }
 
-func NewLoginHandler(context context.Context, logger *zap.SugaredLogger, backend *services.BackendService) *LoginHandler {
+func NewLoginHandler(logger *zap.SugaredLogger, backend *services.BackendService) *LoginHandler {
 	return &LoginHandler{
-		ctx: context,
-		lg:  logger,
-		b:   backend,
+		lg: logger,
+		b:  backend,
 	}
 }
 
@@ -37,7 +34,7 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// should check headers to see if user has an access token and redirect to home page
 
-		pageRender("login", c, h.lg, w, r)
+		pageRender("login", c, false, h.lg, w, r)
 
 	case http.MethodPost:
 

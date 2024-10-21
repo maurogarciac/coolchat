@@ -138,14 +138,20 @@ body {
     }
 }
 
-#login, #chat {
+#logout {
+    h1 {
+        color: #fff;
+    }
+}
+
+#login, #logout, #chat {
     background-color: #2c2c2c;
     border-radius: 10px;
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
     text-align: center;
 }
 
-#login {
+#login, #logout {
     padding: 30px;
     width: 350px;
 
@@ -189,7 +195,7 @@ body {
     border-color: #888;
 }
 
-#login button {
+#login, #logout button {
     width: 100%;
     padding: 15px;
     background-color: #314db3;
@@ -202,11 +208,11 @@ body {
     transition: background-color 0.3s ease;
 }
 
-#login button:hover {
+#login, #logout button:hover {
     background-color: #0056b3;
 }
 
-#login button:active {
+#login, #logout button:active {
     background-color: #003f88;
 }
 

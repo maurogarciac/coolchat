@@ -30,6 +30,21 @@ templ PageHeaders() {
 </head>
 }
 
+templ NavBar(hasToken bool) {
+<div id="nav">
+
+    @NavButton("/home/",  "Home")
+    @NavButton("/chat/",  "Chat App")
+
+    if hasToken {
+        @NavButton("/logout/",  "Log out")
+    } else {
+        @NavButton("/", "Log in")
+    }
+
+</div>
+}
+
 templ NavButton(endpoint string, text string){
 <button hx-push-url={ endpoint } hx-get={ endpoint + "?partial=true" } hx-trigger="click" hx-target="#main" hx-swap="innerHTML">
     { text }
