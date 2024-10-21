@@ -189,7 +189,7 @@ body {
     border-color: #888;
 }
 
-#login input[type="submit"] {
+#login button {
     width: 100%;
     padding: 15px;
     background-color: #314db3;
@@ -202,11 +202,11 @@ body {
     transition: background-color 0.3s ease;
 }
 
-#login input[type="submit"]:hover {
+#login button:hover {
     background-color: #0056b3;
 }
 
-#login input[type="submit"]:active {
+#login button:active {
     background-color: #003f88;
 }
 

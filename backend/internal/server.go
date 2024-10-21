@@ -9,6 +9,7 @@ import (
 
 	"backend/config"
 	"backend/internal/db"
+	"backend/internal/handlers"
 	"backend/internal/ws"
 
 	"go.uber.org/zap"
@@ -43,8 +44,7 @@ func NewHTTPServer(
 func (s *HTTPServer) Start(ctx context.Context) {
 	s.logger.Infof("Starting server on port %d", s.cfg.ServerPort)
 
-	// http.Handle("/login", handlers.NewLoginHandler(ctx, *s.cfg, s.logger))
-	// http.Handle("/ws", middleware.JWTMiddleware(ws.NewChatServer(s.logger)))
+	http.Handle("/login", handlers.NewLoginHandler(ctx, *s.cfg, s.logger))
 	http.Handle("/ws", ws.NewChatServer(s.logger))
 
 	err := s.server.ListenAndServe()

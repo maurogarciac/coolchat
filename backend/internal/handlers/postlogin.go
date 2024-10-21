@@ -77,6 +77,4 @@ func (h *LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "User does not exist", http.StatusBadRequest)
 		}
 	}
-
-	http.Redirect(w, r, "/home/", http.StatusFound)
 }

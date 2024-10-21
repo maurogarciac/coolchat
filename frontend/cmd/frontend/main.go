@@ -12,7 +12,9 @@ import (
 
 	"frontend/config"
 	i "frontend/internal"
+	"frontend/internal/api"
 	"frontend/internal/common"
+	"frontend/internal/services"
 
 	"github.com/caarlos0/env/v10"
 	"github.com/hashicorp/go-retryablehttp"
@@ -24,8 +26,8 @@ func main() {
 
 	appConfig := readAppConfig()
 	appContext := context.Background()
-	// httpConfig := readHTTPConfig()
-	// httpClient := initHTTPClient(httpConfig)
+	httpConfig := readHTTPConfig()
+	httpClient := initHTTPClient(httpConfig)
 	logger := common.NewLogger(appConfig.LogLevel)
 	defer func(logger *zap.SugaredLogger) {
 		err := logger.Sync()
@@ -34,11 +36,11 @@ func main() {
 		}
 	}(logger)
 
-	// backendApi := api.NewBackendAPI(httpClient, httpConfig, logger)
-	// backendService := service.NewBackendService(appConfig, backendApi)
+	backendApi := api.NewBackendApi(httpClient, httpConfig, logger)
+	backendService := services.NewBackendService(appConfig, backendApi)
 
-	httpServer := i.NewHTTPServer(appConfig, logger)
-	go httpServer.Start()
+	httpServer := i.NewHTTPServer(appConfig, logger, backendService)
+	go httpServer.Start(appContext)
 	defer func(appContext context.Context) {
 		err := httpServer.Shutdown(appContext)
 		if err != nil {

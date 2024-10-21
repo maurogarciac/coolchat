@@ -9,6 +9,7 @@ import (
 
 	"frontend/config"
 	"frontend/internal/handlers"
+	"frontend/internal/services"
 
 	"go.uber.org/zap"
 )
@@ -19,11 +20,13 @@ type HTTPServer struct {
 	cfg    *config.AppConfig
 	server *http.Server
 	lg     *zap.SugaredLogger
+	b      *services.BackendService
 }
 
 func NewHTTPServer(
 	appCfg *config.AppConfig,
 	logger *zap.SugaredLogger,
+	backend_service *services.BackendService,
 ) *HTTPServer {
 	server := http.Server{
 		Addr:        fmt.Sprintf(":%d", appCfg.ServerPort),
@@ -34,17 +37,18 @@ func NewHTTPServer(
 		cfg:    appCfg,
 		server: &server,
 		lg:     logger,
+		b:      backend_service,
 	}
 }
 
-func (s *HTTPServer) Start() {
+func (s *HTTPServer) Start(ctx context.Context) {
 	s.lg.Infof("Starting web server on port %d", s.cfg.ServerPort)
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
+	http.Handle("/", handlers.NewLoginHandler(ctx, s.lg, s.b))
 	http.Handle("/home/", handlers.NewHomeHandler(s.lg))
 	http.Handle("/chat/", handlers.NewChatHandler(s.lg))
-	http.Handle("/", handlers.NewLoginHandler(s.lg))
 	http.Handle("/logout/", handlers.NewLogoutHandler(s.lg))
 
 	err := s.server.ListenAndServe()

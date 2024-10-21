@@ -9,7 +9,7 @@ import (
 )
 
 // Checks if the GET request requires a full page or just main content
-func pageRender(name string, c templ.Component, lg *zap.SugaredLogger, w http.ResponseWriter, r *http.Request) {
+func pageRender(templateName string, c templ.Component, lg *zap.SugaredLogger, w http.ResponseWriter, r *http.Request) {
 
 	partial := r.URL.Query()["partial"]
 
@@ -20,7 +20,7 @@ func pageRender(name string, c templ.Component, lg *zap.SugaredLogger, w http.Re
 			http.Error(w, "Error rendering partial template", http.StatusInternalServerError)
 			return
 		} else {
-			lg.Infof("partial %s template rendered", name)
+			lg.Infof("partial %s template rendered", templateName)
 		}
 	} else {
 		err := templates.Layout(c).Render(r.Context(), w) // Render full page
@@ -29,7 +29,7 @@ func pageRender(name string, c templ.Component, lg *zap.SugaredLogger, w http.Re
 			http.Error(w, "Error rendering full template", http.StatusInternalServerError)
 			return
 		} else {
-			lg.Infof("%s template rendered", name)
+			lg.Infof("%s template rendered", templateName)
 		}
 	}
 

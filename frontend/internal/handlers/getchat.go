@@ -21,8 +21,7 @@ func NewChatHandler(logger *zap.SugaredLogger) *ChatHandler {
 
 func (h ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	name := "chat"
-	c := templates.ChatBox("joe")
+	c := templates.ChatBox()
 
 	switch r.Method {
 
@@ -30,7 +29,7 @@ func (h ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// should check headers to see if user has an access token
 
-		pageRender(name, c, h.lg, w, r)
+		pageRender("chat", c, h.lg, w, r)
 
 	default:
 		fmt.Fprintf(w, "only get method is supported")

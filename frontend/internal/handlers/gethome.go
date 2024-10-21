@@ -21,7 +21,7 @@ func NewHomeHandler(logger *zap.SugaredLogger) *HomeHandler {
 
 func (h HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	name := "home"
+	//username := r.Cookies() // get username from jwt
 	c := templates.Home()
 
 	switch r.Method {
@@ -29,7 +29,7 @@ func (h HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		// should check headers to see if user has an access token
 
-		pageRender(name, c, h.lg, w, r)
+		pageRender("home", c, h.lg, w, r)
 
 	default:
 		fmt.Fprintf(w, "only get method is supported")

@@ -1,8 +1,14 @@
 package domain
 
-import "github.com/a-h/templ"
+type User struct {
+	Username string
+	Password string
+}
 
-type LayoutComponents struct {
-	Title   templ.Component
-	Content templ.Component
+type LoginResult struct {
+	Message string
+}
+
+type MessageHistoryResult struct {
+	Messages []byte
 }
