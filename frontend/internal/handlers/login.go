@@ -32,23 +32,13 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 
-		accessToken := ""
-		for _, cookie := range r.Cookies() {
-			if cookie.Name == auth.AccessTokenCookieName {
-				accessToken = cookie.Value
-			}
-		}
+		h.lg.Debug("login GET: ", r.Body)
 
-		_, err := auth.VerifyAccessToken(accessToken)
-		if err != nil {
-			pageRender("login", c, false, h.lg, w, r)
-			return
-		}
-		if err == nil {
-			http.Redirect(w, r, "/home/", http.StatusMovedPermanently)
-		}
+		pageRender("login", c, false, h.lg, w, r)
 
 	case http.MethodPost:
+
+		h.lg.Debug("login POST: ", r.Body)
 
 		var users = []domain.User{
 			{
@@ -61,7 +51,6 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			},
 		}
 
-		// Should check cookies for jwt?
 		err := r.ParseForm()
 		if err != nil {
 			h.lg.Error(err)
@@ -102,15 +91,13 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		if !accepted {
-			// render same template but login = incorrect or something
-			http.Redirect(w, r, "/login", http.StatusBadRequest)
+			// render same template but with login error
+			http.Redirect(w, r, "/login", http.StatusMovedPermanently)
 		}
 
 		http.Redirect(w, r, "/home", http.StatusMovedPermanently)
-
 	default:
 		fmt.Fprintf(w, "only get and post methods are supported")
 		return
-
 	}
 }

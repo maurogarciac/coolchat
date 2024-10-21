@@ -29,14 +29,18 @@ func (h LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 
+		h.lg.Debug("logout GET: ", r.Body)
+
 		pageRender("logout", c, true, h.lg, w, r)
 
 	case http.MethodPost:
 
+		h.lg.Debug("logout POST: ", r.Body)
+
 		deleteTokenCookie(middleware.AccessTokenCookieName, w)
 		deleteTokenCookie(middleware.RefreshTokenCookieName, w)
 
-		http.Redirect(w, r, "/login", http.StatusMovedPermanently)
+		w.Header().Set("HX-Redirect", "/login/")
 
 	default:
 		fmt.Fprintf(w, "only get and post methods are supported")

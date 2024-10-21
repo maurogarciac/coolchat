@@ -51,21 +51,21 @@ func NavBar(hasToken bool) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = NavButton("/home/", "Home").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = NavButton("/home", "Home").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = NavButton("/chat/", "Chat App").Render(ctx, templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = NavButton("/chat", "Chat App").Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if hasToken {
-			templ_7745c5c3_Err = NavButton("/logout/", "Log out").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = NavButton("/logout", "Log out").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = NavButton("/", "Log in").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = NavButton("/login", "Log in").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -33,15 +34,15 @@ func JWTMiddleware(next http.Handler) http.Handler {
 			}
 		}
 		if accessToken == "" {
-			http.Error(w, "Missing access token", http.StatusUnauthorized)
-			return
+			log.Default().Print("Missing access token")
+			w.Header().Set("HX-Redirect", "/login?partial=true")
 		}
 
 		// Parse and validate the token
 		claims, err := VerifyAccessToken(accessToken)
 		if err != nil {
-			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
-			return
+			log.Default().Print("Invalid or expired token")
+			w.Header().Set("HX-Redirect", "/login?partial=true")
 		}
 
 		// You can set the username or other claims in the request context if needed

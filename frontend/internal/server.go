@@ -47,9 +47,10 @@ func (s *HTTPServer) Start(ctx context.Context) {
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	http.Handle("/", handlers.NewLoginHandler(s.lg, s.b))
+	http.Handle("/", m.JWTMiddleware(handlers.NewLandingHandler(s.lg)))
 	http.Handle("/home/", m.JWTMiddleware(handlers.NewHomeHandler(s.lg)))
 	http.Handle("/chat/", m.JWTMiddleware(handlers.NewChatHandler(s.lg)))
+	http.Handle("/login/", handlers.NewLoginHandler(s.lg, s.b))
 	http.Handle("/logout/", m.JWTMiddleware(handlers.NewLogoutHandler(s.lg)))
 
 	err := s.server.ListenAndServe()
