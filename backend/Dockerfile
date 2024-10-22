@@ -1,16 +1,15 @@
 FROM --platform=${BUILDPLATFORM} golang:1.23-alpine AS build
 
 WORKDIR /src
-COPY . .
+COPY backend/ .
 
-RUN mkdir /src/binary
+RUN mkdir /src/bin
 
 ARG TARGETOS
 ARG TARGETARCH
-RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /src/binary cmd/main.go
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -o /src/bin/backend cmd/main.go
 
 FROM scratch AS bin
-COPY --from=build /src/binary /
-COPY --from=build /src/static /static
+COPY --from=build /src/bin /
 
-CMD ["/main"]
+CMD ["/backend"]

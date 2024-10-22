@@ -1,5 +1,5 @@
 services:
-  db:
+  cc-db:
     image: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -11,30 +11,33 @@ services:
       test: pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
       interval: 2s
       retries: 10
-  backend:
+  cc-backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    command: go run backend/cmd/backend/main.go 0.0.0.0:1337
     volumes: 
-      - .:/backend
+      - .:/cc-backend
     ports:
       - "1337:1337"
     restart: unless-stopped
-  web:
+    # healthcheck: # Scratch images don't have wget or curl, need to create health-check bin
+    #   test:  ["CMD", "wget", "--spider", "-q", "localhost:1337/health"]
+    #   interval: 2s
+    #   retries: 5
+    #   start_period: 5s  
+  cc-frontend:
     build:
       context: .
       dockerfile: frontend/Dockerfile
-    command: go run frontend/cmd/frontend/main.go 0.0.0.0:8000
     volumes:
-      - .:/frontend
+      - .:/cc-frontend
     ports:
       - "8000:8000"
     restart: unless-stopped
     depends_on:
-      db:
+      cc-db:
         condition: service_healthy
-      # backend:
+      # cc-backend:
       #   condition: service_healthy
 
 volumes:

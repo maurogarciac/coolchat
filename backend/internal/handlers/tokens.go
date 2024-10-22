@@ -101,6 +101,7 @@ func (h *JwtHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	default:
 		h.lg.Error("only post method is allowed")
+		w.WriteHeader(http.StatusMethodNotAllowed)
 	}
 }
 

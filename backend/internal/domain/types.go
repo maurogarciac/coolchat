@@ -19,6 +19,11 @@ type Message struct {
 	Timestamp time.Time
 }
 
+type InsertMessage struct {
+	Text string
+	From string
+}
+
 type User struct {
 	Username string `json:"username"`
 	Password string `json:"password"`

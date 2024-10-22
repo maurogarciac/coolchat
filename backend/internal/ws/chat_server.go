@@ -1,6 +1,8 @@
 package ws
 
 import (
+	"backend/internal/db"
+	"backend/internal/domain"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -33,13 +35,15 @@ type ChatServer struct {
 	clients ClientList
 	sync.RWMutex
 	handlers map[string]EventHandler
+	db       *db.DbProvider
 }
 
-func NewChatServer(logger *zap.SugaredLogger) *ChatServer {
+func NewChatServer(logger *zap.SugaredLogger, database *db.DbProvider) *ChatServer {
 	s := &ChatServer{
 		lg:       logger,
 		clients:  make(ClientList),
 		handlers: make(map[string]EventHandler),
+		db:       database,
 	}
 	s.setupEventHandlers()
 	return s
@@ -106,6 +110,11 @@ func (s *ChatServer) broadcastMessage(message []byte, user string) error {
 	}
 	outgoingEvent.Message = string(data)
 
+	msg := domain.InsertMessage{
+		Text: returnMessage.Text,
+		From: returnMessage.User,
+	}
+	s.db.InsertMessage(msg)
 	for client := range s.clients {
 		client.egress <- outgoingEvent // broadcast to egress of all clients
 	}

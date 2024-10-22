@@ -44,9 +44,14 @@ func NewHTTPServer(
 func (s *HTTPServer) Start(ctx context.Context) {
 	s.lg.Infof("Starting server on port %d", s.cfg.ServerPort)
 
-	http.Handle("/ws", ws.NewChatServer(s.lg))
+	http.Handle("/ws", ws.NewChatServer(s.lg, s.db))
 	http.Handle("/auth", handlers.NewJwtHandler(s.lg))
 	http.Handle("/refresh", handlers.NewRefreshTokenHandler(s.lg))
+	http.HandleFunc("/health",
+		func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("OK"))
+		})
 
 	err := s.sv.ListenAndServe()
 	for {

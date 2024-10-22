@@ -16,7 +16,7 @@ type Event struct {
 }
 
 type EgressMessageEvent struct {
-	Message string    `json:"message"`
-	User    string    `json:"user"`
-	Sent    time.Time `json:"sent"`
+	Text string    `json:"message"`
+	User string    `json:"user"`
+	Sent time.Time `json:"sent"`
 }

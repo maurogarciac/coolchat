@@ -21,28 +21,28 @@ vet:
 ## debug: run the server in debug mode
 .PHONY: debug
 debug:
-	go run cmd/frontend/main.go
+	go run cmd/main.go
 
-## start: run the server
+## start: run the server locally
 .PHONY: start
 start:
-	go run cmd/frontend/main.go
+	go run cmd/main.go
 
 # build: build a binary
 .PHONY: build
 build:
-	go build cmd/frontend/ -o ./bin
+	go build -o bin/frontend ./cmd
 
 ## startd: start docker container for server
 .PHONY: startd
 startd:
-	docker run frontend:latest
+	docker run cc-frontend:latest
 
 ## binux: build docker container with app binary
 .PHONY: binux
 binux:
 	@docker build \
-	-t frontend \
+	-t cc-frontend \
 	--platform local .
 
 all: help

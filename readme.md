@@ -10,15 +10,18 @@ Make sure to put on some sunglasses before you connect and start yapping! (backg
 2. In the root directory of the project, run:
 ```docker compose up -d```
 
-This will spin up all the containers and they should connect automatically (unless some of their preconfigured ports are in use by the host machine)
+This will create all images and spin up all containers and they should connect automatically (unless some of their preconfigured ports are in use by the host machine)
 
 The preconfigured ports are:
     - Frontend : 8000
     - Backend  : 1337
 
+* If you want to run a single container, do:
+```docker compose up -d {container_name}```
+
 # How to chat!
 
-You can use these user creds to log-in:
+You can use these user credentials to log-in:
 - user:'bob', password:'root'
 - user:'alice', password:'root'
 

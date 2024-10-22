@@ -82,7 +82,7 @@ func (p *DbProvider) SelectAllMessages() (domain.MessageHistory, error) {
 	return messages, nil
 }
 
-func (p *DbProvider) InsertMessage(msg domain.Message) error {
+func (p *DbProvider) InsertMessage(msg domain.InsertMessage) error {
 
 	query := `
 		INSERT INTO messages (id, user, message, timestamp)

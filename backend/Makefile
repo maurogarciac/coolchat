@@ -11,7 +11,7 @@ lint:
 ## init: initialize project (make init module=github.com/user/project)
 .PHONY: install
 install:
-	go install cmd/backend/
+	go install cmd/
 
 ## vet: vet code
 .PHONY: vet
@@ -21,21 +21,21 @@ vet:
 ## start: run the server
 .PHONY: start
 start:
-	go run cmd/backend/main.go
+	go run cmd/main.go
 
 all: help
 
 # build: build a binary
 .PHONY: build
 build:
-	go build cmd/backend/ -o ./bin
+	go build -o bin/backend ./cmd
 
 
 ## binux: build docker container with app binary
 .PHONY: binux
 binux:
 	@docker build \
-	-t backend \
+	-t cc-backend \
 	--platform local .
 
 all: help
@@ -43,7 +43,7 @@ all: help
 ## startd: start the docker container for server
 .PHONY: startd
 startd:
-	docker run backend:latest
+	docker run cc-backend:latest
 
 .PHONY: help
 help: Makefile
