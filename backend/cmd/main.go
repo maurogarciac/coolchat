@@ -26,22 +26,30 @@ func main() {
 
 	logger := common.NewLogger(appConfig.LogLevel)
 	defer func(logger *zap.SugaredLogger) {
-		err := logger.Sync()
-		if err != nil && !errors.Is(err, syscall.ENOTTY) {
+		if err := logger.Sync(); err != nil && !errors.Is(err, syscall.ENOTTY) {
 			logger.Warnf("Failed to flush log buffer: %v", err)
 		}
 	}(logger)
 
-	dbConfig := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		appConfig.DbHost, appConfig.DbPort, appConfig.DbUser, appConfig.DbPassword, appConfig.DbName)
+	dbConfig := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable",
+		appConfig.DbUser,
+		appConfig.DbPassword,
+		appConfig.DbHost,
+		appConfig.DbPort,
+		appConfig.DbName)
 
-	database := db.NewdbProvider(dbConfig, appContext, logger)
+	database, err := db.NewDbProvider(dbConfig, logger)
+	if err != nil {
+		logger.Error("could not connect to db")
+	}
+	if err := database.SetupDb(); err != nil {
+		logger.Error(err)
+	}
 
 	httpServer := internal.NewHTTPServer(appConfig, logger, database)
 	go httpServer.Start(appContext)
 	defer func(appContext context.Context) {
-		err := httpServer.Shutdown(appContext)
-		if err != nil {
+		if err := httpServer.Shutdown(appContext); err != nil {
 			logger.Errorf("Failed to shutdown server: %v", err)
 		}
 	}(appContext)

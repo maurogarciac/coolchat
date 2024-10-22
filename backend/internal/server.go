@@ -38,6 +38,7 @@ func NewHTTPServer(
 		cfg: appConfig,
 		sv:  &server,
 		lg:  logger,
+		db:  database,
 	}
 }
 
@@ -47,6 +48,7 @@ func (s *HTTPServer) Start(ctx context.Context) {
 	http.Handle("/ws", ws.NewChatServer(s.lg, s.db))
 	http.Handle("/auth", handlers.NewJwtHandler(s.lg, s.cfg))
 	http.Handle("/refresh", handlers.NewRefreshTokenHandler(s.lg, s.cfg))
+	http.Handle("/messages", handlers.NewMessageHandler(s.lg, *s.db))
 	http.HandleFunc("/health",
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)

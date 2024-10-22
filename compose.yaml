@@ -1,14 +1,18 @@
 services:
   cc-db:
-    image: postgres
+    build:
+      context: .
+      dockerfile: db/Dockerfile
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - db/.env.docker
     environment:
-      - POSTGRES_DB=login
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - DB_AND_USER=postgres
+    ports:
+      - "5432:5432"
     healthcheck:
-      test: pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}
+      test: pg_isready -d $${DB_AND_USER} -U $${DB_AND_USER}
       interval: 2s
       retries: 10
     networks:
@@ -25,13 +29,16 @@ services:
       - backend/.env
       - backend/.env.docker
     restart: unless-stopped
-    # healthcheck: # Scratch images don't have wget or curl, need to create health-check bin
+    # healthcheck: # Scratch images don't have wget or curl, need to create health-check binary or smth
     #   test:  ["CMD", "wget", "--spider", "-q", "localhost:1337/health"]
     #   interval: 2s
     #   retries: 5
     #   start_period: 5s  
     networks:
       - coolchat-network 
+    depends_on:
+      cc-db:
+        condition: service_healthy
   cc-frontend:
     build:
       context: .

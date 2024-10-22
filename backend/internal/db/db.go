@@ -3,95 +3,92 @@ package db
 import (
 	"backend/internal/domain"
 	"context"
-	"database/sql"
 	"fmt"
-	"log"
 
+	"github.com/jackc/pgx/v4/pgxpool"
 	"go.uber.org/zap"
-	_ "modernc.org/sqlite"
 )
 
 type DbProvider struct {
-	db     *sql.DB
-	config string
-	ctx    context.Context
-	lg     zap.SugaredLogger
+	pool *pgxpool.Pool
+	ctx  context.Context
+	lg   *zap.SugaredLogger
 }
 
-func NewdbProvider(db_config string, context context.Context, logger *zap.SugaredLogger) *DbProvider {
+func NewDbProvider(connString string, logger *zap.SugaredLogger) (*DbProvider, error) {
+
+	logger.Debug("Postgres connection string: ", connString)
+
+	dbCtx := context.Background()
+
+	pool, err := pgxpool.Connect(dbCtx, connString)
+	if err != nil {
+		return nil, fmt.Errorf("unable to connect to database: %v", err)
+	}
+
+	err = pool.Ping(dbCtx)
+	if err != nil {
+		return nil, fmt.Errorf("db ping failed: %v", err)
+	}
+
 	return &DbProvider{
-		lg:     *logger,
-		config: db_config,
-		ctx:    context,
-	}
+		pool: pool,
+		ctx:  dbCtx,
+		lg:   logger}, nil
 }
 
-func (p *DbProvider) InitDatabase() error {
-	var err error
+func (d *DbProvider) Close() {
+	d.pool.Close()
+}
 
-	p.db, err = sql.Open("postgres", p.config)
+// SetupDatabase initializes the messages table.
+func (d *DbProvider) SetupDb() error {
+	_, err := d.pool.Exec(context.Background(),
+		`CREATE EXTENSION IF NOT EXISTS "pgcrypto";`+
+			`CREATE TABLE IF NOT EXISTS messages (
+            id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            username VARCHAR(255) NOT NULL,
+            message TEXT NOT NULL,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`)
 	if err != nil {
-		panic(err)
-	}
-	p.lg.Info("Connection to db successful")
-	defer p.db.Close()
-
-	_, err = p.db.ExecContext(p.ctx,
-		`
-		CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-		CREATE TABLE messages (
-			id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-			user VARCHAR(255) NOT NULL,
-			message TEXT NOT NULL,
-			timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
-		);`,
-	)
-
-	if err != nil {
-		return err
+		return fmt.Errorf("failed to create messages table: %v", err)
 	}
 	return nil
-
 }
 
-func (p *DbProvider) SelectAllMessages() (domain.MessageHistory, error) {
-	rows, err := p.db.QueryContext(p.ctx,
-		`SELECT * FROM messages ORDER BY timestamp ASC;`,
-	)
+// Retrieves all messages ordered by timestamp.
+func (d *DbProvider) SelectAllMessages() (domain.MessageHistory, error) {
+	rows, err := d.pool.Query(d.ctx,
+		"SELECT id, username, message, timestamp FROM messages ORDER BY timestamp")
 	if err != nil {
-		log.Fatal(err)
+		return domain.MessageHistory{}, fmt.Errorf("failed to fetch messages: %v", err)
 	}
 	defer rows.Close()
 
 	var messages domain.MessageHistory
-
 	for rows.Next() {
 		var msg domain.Message
-		err := rows.Scan(&msg.ID, &msg.From, &msg.Text, &msg.Timestamp)
-		if err != nil {
-			return domain.MessageHistory{}, fmt.Errorf("failed to scan row: %w", err)
+		if err := rows.Scan(&msg.ID, &msg.From, &msg.Text, &msg.Timestamp); err != nil {
+			return domain.MessageHistory{}, fmt.Errorf("failed to scan message: %v", err)
 		}
 		messages.MessageList = append(messages.MessageList, msg)
-	}
-
-	if err := rows.Err(); err != nil {
-		return domain.MessageHistory{}, fmt.Errorf("row iteration error: %w", err)
 	}
 
 	return messages, nil
 }
 
-func (p *DbProvider) InsertMessage(msg domain.InsertMessage) error {
+// Inserts a new message into the messages table.
+func (d *DbProvider) InsertMessage(msg domain.InsertMessage) (string, error) {
 
-	query := `
-		INSERT INTO messages (id, user, message, timestamp)
-		VALUES (uuid_generate_v4(), $1, $2, CURRENT_TIMESTAMP);
-	`
-	_, err := p.db.ExecContext(p.ctx, query, msg.From, msg.Text)
+	d.lg.Info("db pool: %+v\n", d.pool) // Check if db is nil
+
+	var id string
+	err := d.pool.QueryRow(d.ctx,
+		`INSERT INTO messages (id, username, message, timestamp) 
+		VALUES (gen_random_uuid(), $1, $2, CURRENT_TIMESTAMP) RETURNING id`,
+		msg.From, msg.Text).Scan(&id)
 	if err != nil {
-		return fmt.Errorf("failed to insert message: %w", err)
+		return "", fmt.Errorf("failed to insert message: %v", err)
 	}
-
-	return nil
+	return id, nil
 }

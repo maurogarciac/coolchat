@@ -66,8 +66,7 @@ func (s *ChatServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user := "testuser"
-	// r.Header.Get("BearerToken")  // use token info to get username ??
+	user := "cooltestuser" // User message text to get user
 
 	client := NewClient(s.lg, user, conn, s)
 	s.addClient(client)
@@ -114,7 +113,16 @@ func (s *ChatServer) broadcastMessage(message []byte, user string) error {
 		Text: returnMessage.Text,
 		From: returnMessage.User,
 	}
-	s.db.InsertMessage(msg)
+
+	if s.db == nil {
+		errStr := "could not save message. database connection is not initialized"
+		s.lg.Error(errStr)
+		return fmt.Errorf("%s", errStr)
+	}
+	if _, err := s.db.InsertMessage(msg); err != nil {
+		return fmt.Errorf("failed to insert message: %v", err)
+	}
+
 	for client := range s.clients {
 		client.egress <- outgoingEvent // broadcast to egress of all clients
 	}
