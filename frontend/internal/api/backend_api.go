@@ -14,6 +14,12 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	authEndpoint     = "/auth"
+	refreshEndpoint  = "/refresh"
+	messagesEndpoint = "/messages"
+)
+
 type BackendApi struct {
 	client *http.Client
 	cfg    *config.HTTPConfig
@@ -30,7 +36,7 @@ func (p *BackendApi) PostLogin(ctx context.Context, input domain.User) (domain.L
 	ctx, cancel := context.WithTimeout(ctx, p.cfg.Timeout)
 	defer cancel()
 
-	url := p.cfg.BackendAPIURL + "/auth"
+	url := p.cfg.BackendAPIURL + authEndpoint
 	p.lg.Debugf("backend-api POST login request to url=%s", url)
 
 	body := toBackendApiLoginRequest(input)
@@ -74,7 +80,7 @@ func (p *BackendApi) PostRefresh(ctx context.Context, input domain.RefreshToken)
 	ctx, cancel := context.WithTimeout(ctx, p.cfg.Timeout)
 	defer cancel()
 
-	url := p.cfg.BackendAPIURL + "/refresh"
+	url := p.cfg.BackendAPIURL + refreshEndpoint
 	p.lg.Debugf("backend-api POST token refresh request to url=%s", url)
 
 	body := toBackendApiRefreshRequest(input)
@@ -117,7 +123,7 @@ func (p *BackendApi) GetMessageHistory(ctx context.Context) (domain.MessageHisto
 	ctx, cancel := context.WithTimeout(ctx, p.cfg.Timeout)
 	defer cancel()
 
-	url := p.cfg.BackendAPIURL + "/messages"
+	url := p.cfg.BackendAPIURL + messagesEndpoint
 	p.lg.Debugf("backend-api GET messages request to url=%s", url)
 
 	req, err := http.NewRequest("GET", url, nil) // Create POST request

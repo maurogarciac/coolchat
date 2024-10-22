@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"backend/config"
 	d "backend/internal/domain"
 
 	"go.uber.org/zap"
@@ -12,12 +13,14 @@ import (
 // Refresh token Handler
 
 type RefreshTokenHandler struct {
-	lg *zap.SugaredLogger
+	lg  *zap.SugaredLogger
+	cfg *config.AppConfig
 }
 
-func NewRefreshTokenHandler(logger *zap.SugaredLogger) *RefreshTokenHandler {
+func NewRefreshTokenHandler(logger *zap.SugaredLogger, config *config.AppConfig) *RefreshTokenHandler {
 	return &RefreshTokenHandler{
-		lg: logger,
+		lg:  logger,
+		cfg: config,
 	}
 }
 
@@ -30,18 +33,20 @@ func (h *RefreshTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 
 	token := r.FormValue("token")
 
-	RefreshAccessToken(token, w, r)
+	RefreshAccessToken(token, w, r, h.cfg.JwtSecretKey, h.cfg.JwtRefreshSecretKey)
 }
 
 // Full login JWT Handler
 
 type JwtHandler struct {
-	lg *zap.SugaredLogger
+	lg  *zap.SugaredLogger
+	cfg *config.AppConfig
 }
 
-func NewJwtHandler(logger *zap.SugaredLogger) *JwtHandler {
+func NewJwtHandler(logger *zap.SugaredLogger, config *config.AppConfig) *JwtHandler {
 	return &JwtHandler{
-		lg: logger,
+		lg:  logger,
+		cfg: config,
 	}
 }
 
@@ -77,7 +82,7 @@ func (h *JwtHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				h.lg.Infof("%s logged in!", u.Username)
 				var tokens d.AuthTokens
 				tokens.AccessToken, tokens.RefreshToken, err = GenerateTokens(
-					user_candidate.Username) // Generate JWT tokens in a cookie for the user
+					user_candidate.Username, h.cfg.JwtSecretKey, h.cfg.JwtRefreshSecretKey) // Generate JWT tokens in a cookie for the user
 				if err != nil {
 					http.Error(w, "Could not generate tokens for the user",
 						http.StatusInternalServerError)

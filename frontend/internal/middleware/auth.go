@@ -12,10 +12,8 @@ import (
 )
 
 const (
-	// Secrets should be in env variables
 	AccessTokenCookieName  = "access_token"
 	RefreshTokenCookieName = "refresh_token"
-	JwtSecretKey           = "Bs2S9WLytsE8nPjIMzbd3FgE6VAVODTh"
 )
 
 type Claims struct {
@@ -24,7 +22,7 @@ type Claims struct {
 }
 
 // Middleware to validate JWT Access Tokens
-func AuthRequired(next http.Handler, b services.BackendService) http.Handler {
+func AuthRequired(next http.Handler, b services.BackendService, secretKey string) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -38,7 +36,7 @@ func AuthRequired(next http.Handler, b services.BackendService) http.Handler {
 		var err error
 		if accessToken != "" {
 			// Parse and validate the token
-			claims, err = VerifyAccessToken(accessToken)
+			claims, err = VerifyAccessToken(accessToken, secretKey)
 			if err != nil {
 				log.Default().Print("Invalid or expired token")
 				http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
@@ -60,7 +58,7 @@ func AuthRequired(next http.Handler, b services.BackendService) http.Handler {
 				log.Default().Print("Error ocurred getting access token from backend")
 				http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
 			}
-			claims, err = VerifyAccessToken(newAccessToken.AccessToken)
+			claims, err = VerifyAccessToken(newAccessToken.AccessToken, secretKey)
 			if err != nil {
 				log.Default().Print("Invalid or expired token")
 				// w.Header().Set("HX-Redirect", "/login?partial=true")
@@ -99,11 +97,11 @@ func GetAccessToken(r *http.Request) string {
 }
 
 // Verifies the Access Token
-func VerifyAccessToken(tokenStr string) (*Claims, error) {
+func VerifyAccessToken(tokenStr string, jwtSecretKey string) (*Claims, error) {
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(JwtSecretKey), nil
+		return []byte(jwtSecretKey), nil
 	})
 	if err != nil || !token.Valid {
 		return nil, err
