@@ -4,6 +4,8 @@ import (
 	"frontend/internal/domain"
 )
 
+// Login
+
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -17,15 +19,42 @@ func toBackendApiLoginRequest(input domain.User) LoginRequest {
 }
 
 type PostLoginResponse struct {
-	Message string `json:"message"`
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func (r *PostLoginResponse) PostLoginResult() domain.LoginResult {
 
 	return domain.LoginResult{
-		Message: r.Message,
+		AccessToken:  r.AccessToken,
+		RefreshToken: r.RefreshToken,
 	}
 }
+
+// Refresh Access Token
+
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
+func toBackendApiRefreshRequest(input domain.RefreshToken) RefreshRequest {
+	return RefreshRequest{
+		RefreshToken: input.Token,
+	}
+}
+
+type PostRefreshResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+func (r *PostRefreshResponse) PostRefreshResult() domain.RefreshResult {
+
+	return domain.RefreshResult{
+		AccessToken: r.AccessToken,
+	}
+}
+
+// Message history
 
 type MessageHistoryResponse struct {
 	Messages []byte `json:"messages"`

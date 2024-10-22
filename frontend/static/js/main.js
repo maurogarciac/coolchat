@@ -37,7 +37,12 @@ htmx.defineExtension("ws-html-response", {
         messageDiv.appendChild(msgHeaderDiv)
         messageDiv.appendChild(msgContentDiv)
     }
-});
+})
+
+document.addEventListener("htmx:wsConfigSend", function (event) {
+   console.log(event.detail.data)
+})
+
 
     // function getCookieByName(name) {
     //     const cookies = document.cookie.split(";");

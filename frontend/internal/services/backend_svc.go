@@ -23,6 +23,7 @@ func NewBackendService(
 	}
 }
 
+// Issue a POST request to the Backend to retrieve JWT Access and Refresh tokens
 func (b *BackendService) PostLogin(ctx context.Context, input domain.User) (domain.LoginResult, error) {
 
 	res, err := b.backend.PostLogin(ctx, input)
@@ -33,6 +34,18 @@ func (b *BackendService) PostLogin(ctx context.Context, input domain.User) (doma
 	return res, nil
 }
 
+// Issue a POST request to the Backend to retrieve an updated Access Token
+func (b *BackendService) PostRefresh(ctx context.Context, input domain.RefreshToken) (domain.RefreshResult, error) {
+
+	res, err := b.backend.PostRefresh(ctx, input)
+	if err != nil {
+		return domain.RefreshResult{}, err
+	}
+
+	return res, nil
+}
+
+// Issue a GET request to the Backend to retrieve chat message history
 func (b *BackendService) GetMessageHistory(ctx context.Context) (domain.MessageHistoryResult, error) {
 
 	messages, err := b.backend.GetMessageHistory(ctx)

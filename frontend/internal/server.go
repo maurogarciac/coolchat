@@ -1,4 +1,4 @@
-package resthttp
+package internal
 
 import (
 	"context"
@@ -47,11 +47,11 @@ func (s *HTTPServer) Start(ctx context.Context) {
 
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	http.Handle("/", m.JWTMiddleware(handlers.NewLandingHandler(s.lg)))
-	http.Handle("/home/", m.JWTMiddleware(handlers.NewHomeHandler(s.lg)))
-	http.Handle("/chat/", m.JWTMiddleware(handlers.NewChatHandler(s.lg)))
-	http.Handle("/login/", handlers.NewLoginHandler(s.lg, s.b))
-	http.Handle("/logout/", m.JWTMiddleware(handlers.NewLogoutHandler(s.lg)))
+	http.Handle("/", m.AuthRequired(handlers.NewLandingHandler(s.lg), *s.b))
+	http.Handle("/home/", m.AuthRequired(handlers.NewHomeHandler(s.lg), *s.b))
+	http.Handle("/chat/", m.AuthRequired(handlers.NewChatHandler(s.lg), *s.b))
+	http.Handle("/login/", handlers.NewLoginHandler(ctx, s.lg, s.b))
+	http.Handle("/logout/", m.AuthRequired(handlers.NewLogoutHandler(s.lg), *s.b))
 
 	err := s.server.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {

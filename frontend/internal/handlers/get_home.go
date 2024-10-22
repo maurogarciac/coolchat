@@ -31,11 +31,10 @@ func (h HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 
-		// should check headers to see if user has an access token
-
 		pageRender("home", c, true, h.lg, w, r)
 
 	default:
+
 		fmt.Fprintf(w, "only get method is supported")
 		return
 	}

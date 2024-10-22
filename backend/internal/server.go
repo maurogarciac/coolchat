@@ -9,6 +9,7 @@ import (
 
 	"backend/config"
 	"backend/internal/db"
+	"backend/internal/handlers"
 	"backend/internal/ws"
 
 	"go.uber.org/zap"
@@ -17,50 +18,51 @@ import (
 const serverShutdownTimeoutDuration = 60 * time.Second
 
 type HTTPServer struct {
-	cfg      *config.AppConfig
-	server   *http.Server
-	logger   *zap.SugaredLogger
-	database *db.DbProvider
+	cfg *config.AppConfig
+	sv  *http.Server
+	lg  *zap.SugaredLogger
+	db  *db.DbProvider
 }
 
 func NewHTTPServer(
-	appCfg *config.AppConfig,
-	lg *zap.SugaredLogger,
-	db *db.DbProvider,
+	appConfig *config.AppConfig,
+	logger *zap.SugaredLogger,
+	database *db.DbProvider,
 ) *HTTPServer {
 	server := http.Server{
-		Addr:        fmt.Sprintf(":%d", appCfg.ServerPort),
-		ReadTimeout: appCfg.ReadTimeout,
+		Addr:        fmt.Sprintf(":%d", appConfig.ServerPort),
+		ReadTimeout: appConfig.ReadTimeout,
 	}
 
 	return &HTTPServer{
-		cfg:    appCfg,
-		server: &server,
-		logger: lg,
+		cfg: appConfig,
+		sv:  &server,
+		lg:  logger,
 	}
 }
 
 func (s *HTTPServer) Start(ctx context.Context) {
-	s.logger.Infof("Starting server on port %d", s.cfg.ServerPort)
+	s.lg.Infof("Starting server on port %d", s.cfg.ServerPort)
 
-	// http.Handle("/login", handlers.NewLoginHandler(ctx, *s.cfg, s.logger))
-	http.Handle("/ws", ws.NewChatServer(s.logger))
+	http.Handle("/ws", ws.NewChatServer(s.lg))
+	http.Handle("/auth", handlers.NewJwtHandler(s.lg))
+	http.Handle("/refresh", handlers.NewRefreshTokenHandler(s.lg))
 
-	err := s.server.ListenAndServe()
+	err := s.sv.ListenAndServe()
 	for {
 		if errors.Is(err, http.ErrServerClosed) {
-			s.logger.Info("Server closed")
+			s.lg.Info("Server closed")
 		} else if err != nil {
-			s.logger.Fatal("Failed to start server", zap.Error(err))
+			s.lg.Fatal("Failed to start server", zap.Error(err))
 		}
 	}
 }
 
 func (s *HTTPServer) Shutdown(ctx context.Context) error {
-	s.logger.Info("Shutting down server")
-	if s.server != nil {
+	s.lg.Info("Shutting down server")
+	if s.sv != nil {
 		shutdownCtx, shutdownRelease := context.WithTimeout(ctx, serverShutdownTimeoutDuration)
-		err := s.server.Shutdown(shutdownCtx)
+		err := s.sv.Shutdown(shutdownCtx)
 		shutdownRelease()
 		return err
 	}

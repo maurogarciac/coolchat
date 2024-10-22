@@ -5,6 +5,7 @@ go 1.22.0
 require (
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/go-chi/chi/v5 v5.0.12
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/gorilla/websocket v1.5.3
 	go.uber.org/zap v1.27.0
 	modernc.org/sqlite v1.33.1

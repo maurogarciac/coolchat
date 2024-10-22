@@ -32,8 +32,6 @@ func (h ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 
-		// should check headers to see if user has an access token
-
 		pageRender("chat", c, true, h.lg, w, r)
 
 	default:

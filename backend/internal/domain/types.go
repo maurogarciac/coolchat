@@ -16,6 +16,11 @@ type Message struct {
 }
 
 type User struct {
-	Username string
-	Password string
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type AuthTokens struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }

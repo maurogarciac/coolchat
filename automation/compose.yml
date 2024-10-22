@@ -1,4 +1,4 @@
-name: wdp-login-tests
+name: coolchat-tests
 services:
   run:
     platform: linux/amd64
@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./reports:/wdp-login-tests/reports
+      - ./reports:/coolchat-tests/reports
     command:
       - pytest
     env_file:
