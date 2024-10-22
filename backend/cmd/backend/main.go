@@ -32,8 +32,8 @@ func main() {
 		}
 	}(logger)
 
-	dbConfig := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		&appConfig.DbHost, &appConfig.DbPort, &appConfig.DbUser, &appConfig.DbPassword, &appConfig.DbName)
+	dbConfig := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		appConfig.DbHost, appConfig.DbPort, appConfig.DbUser, appConfig.DbPassword, appConfig.DbName)
 
 	database := db.NewdbProvider(dbConfig, appContext, logger)
 

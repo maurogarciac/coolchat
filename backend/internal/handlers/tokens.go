@@ -76,15 +76,18 @@ func (h *JwtHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 				h.lg.Infof("%s logged in!", u.Username)
 				var tokens d.AuthTokens
-				tokens.AccessToken, tokens.RefreshToken, err = GenerateTokens(user_candidate.Username) // Generate JWT tokens in a cookie for the user
+				tokens.AccessToken, tokens.RefreshToken, err = GenerateTokens(
+					user_candidate.Username) // Generate JWT tokens in a cookie for the user
 				if err != nil {
-					http.Error(w, "Could not generate tokens for the user", http.StatusInternalServerError)
+					http.Error(w, "Could not generate tokens for the user",
+						http.StatusInternalServerError)
 					return
 				}
 
 				tokensJson, err := json.Marshal(tokens)
 				if err != nil {
-					http.Error(w, "Could not marshal json response", http.StatusInternalServerError)
+					http.Error(w, "Could not marshal json response",
+						http.StatusInternalServerError)
 					return
 				}
 

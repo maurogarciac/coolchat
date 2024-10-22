@@ -1,8 +1,10 @@
 package db
 
 import (
+	"backend/internal/domain"
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 
 	"go.uber.org/zap"
@@ -16,11 +18,11 @@ type DbProvider struct {
 	lg     zap.SugaredLogger
 }
 
-func NewdbProvider(db_config string, ctxt context.Context, logger *zap.SugaredLogger) *DbProvider {
+func NewdbProvider(db_config string, context context.Context, logger *zap.SugaredLogger) *DbProvider {
 	return &DbProvider{
 		lg:     *logger,
 		config: db_config,
-		ctx:    ctxt,
+		ctx:    context,
 	}
 }
 
@@ -34,13 +36,15 @@ func (p *DbProvider) InitDatabase() error {
 	p.lg.Info("Connection to db successful")
 	defer p.db.Close()
 
-	_, err = p.db.ExecContext(
-		context.Background(),
-		`CREATE TABLE users (
-			id SERIAL PRIMARY KEY,
-			username VARCHAR(50) UNIQUE NOT NULL,
-			password_hash TEXT NOT NULL,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	_, err = p.db.ExecContext(p.ctx,
+		`
+		CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+		CREATE TABLE messages (
+			id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+			user VARCHAR(255) NOT NULL,
+			message TEXT NOT NULL,
+			timestamp TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 		);`,
 	)
 
@@ -51,43 +55,43 @@ func (p *DbProvider) InitDatabase() error {
 
 }
 
-type User struct {
-	Email          string
-	PasswordHash   string
-	LastConnection string
-}
-
-func (p *DbProvider) CreateUser(u User) {
-
-	insertUsers := `INSERT INTO users(email, pwhash, ltconnect) VALUES (?, ?, ?)`
-	statement, err := p.db.Prepare(insertUsers)
-
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	_, err = statement.Exec(u.Email, u.PasswordHash, u.LastConnection)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-}
-
-func (p *DbProvider) SelectUserByEmail(userEmail string) (User, error) {
-	rows, err := p.db.QueryContext(
-		context.Background(),
-		`SELECT * FROM users WHERE email=?;`, userEmail,
+func (p *DbProvider) SelectAllMessages() (domain.MessageHistory, error) {
+	rows, err := p.db.QueryContext(p.ctx,
+		`SELECT * FROM messages ORDER BY timestamp ASC;`,
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-	var user User
+
+	var messages domain.MessageHistory
+
 	for rows.Next() {
-		if err := rows.Scan(
-			&user.Email, &user.PasswordHash, &user.LastConnection,
-		); err != nil {
-			return user, err
+		var msg domain.Message
+		err := rows.Scan(&msg.ID, &msg.From, &msg.Text, &msg.Timestamp)
+		if err != nil {
+			return domain.MessageHistory{}, fmt.Errorf("failed to scan row: %w", err)
 		}
+		messages.MessageList = append(messages.MessageList, msg)
 	}
-	p.lg.Info("User retrieved by email: ")
-	return user, nil
+
+	if err := rows.Err(); err != nil {
+		return domain.MessageHistory{}, fmt.Errorf("row iteration error: %w", err)
+	}
+
+	return messages, nil
+}
+
+func (p *DbProvider) InsertMessage(msg domain.Message) error {
+
+	query := `
+		INSERT INTO messages (id, user, message, timestamp)
+		VALUES (uuid_generate_v4(), $1, $2, CURRENT_TIMESTAMP);
+	`
+	_, err := p.db.ExecContext(p.ctx, query, msg.From, msg.Text)
+	if err != nil {
+		return fmt.Errorf("failed to insert message: %w", err)
+	}
+
+	return nil
 }

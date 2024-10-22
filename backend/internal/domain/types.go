@@ -5,12 +5,16 @@ import (
 )
 
 type GetAllMessagesResult struct {
-	Messages string `json:"messages"`
+	Messages []Message `json:"messages"`
+}
+
+type MessageHistory struct {
+	MessageList []Message
 }
 
 type Message struct {
 	ID        string
-	Message   string
+	Text      string
 	From      string
 	Timestamp time.Time
 }
