@@ -33,10 +33,11 @@ func (h *MessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			h.lg.Errorf("error getting messages: ", err)
 			http.Error(w, "Could not get messages", http.StatusInternalServerError)
+
 		}
-		h.lg.Info(messages)
+		h.lg.Debug(messages)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusAccepted)
+		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(messages.MessageList)
 
 	default:

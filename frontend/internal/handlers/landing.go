@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"go.uber.org/zap"
@@ -26,8 +25,7 @@ func (h LandingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("HX-Redirect", "/home?partial=true")
 
 	default:
-		fmt.Fprintf(w, "only get and post methods are supported")
-		return
-
+		h.lg.Error("Only GET method is supported")
+		http.Error(w, "Only GET method is supported", http.StatusMethodNotAllowed)
 	}
 }

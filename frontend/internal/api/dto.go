@@ -57,10 +57,11 @@ func (r *PostRefreshResponse) PostRefreshResult() domain.RefreshResult {
 // Message history
 
 type MessageHistoryResponse struct {
-	Messages []byte `json:"messages"`
+	Messages []domain.Message
 }
 
 func (r *MessageHistoryResponse) MessageHistoryResult() domain.MessageHistoryResult {
+
 	return domain.MessageHistoryResult{
 		Messages: r.Messages,
 	}

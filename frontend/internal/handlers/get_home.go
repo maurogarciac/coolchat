@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 
 	"frontend/internal/templates"
@@ -34,9 +33,8 @@ func (h HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		pageRender("home", c, true, h.lg, w, r)
 
 	default:
-
-		fmt.Fprintf(w, "only get method is supported")
-		return
+		h.lg.Error("Only GET method is supported")
+		http.Error(w, "Only GET method is supported", http.StatusMethodNotAllowed)
 	}
 
 }

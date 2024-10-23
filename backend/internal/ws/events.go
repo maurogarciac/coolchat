@@ -21,9 +21,9 @@ type RecievedEgressMessage struct {
 }
 
 type ReturnMessage struct {
-	Text string    `json:"text"`
-	User string    `json:"user"`
-	Sent time.Time `json:"sent"`
+	Text      string    `json:"text"`
+	User      string    `json:"user"`
+	Timestamp time.Time `json:"ts"`
 }
 
 type Event struct {

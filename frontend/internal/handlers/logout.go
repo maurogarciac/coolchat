@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -43,8 +42,8 @@ func (h LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("HX-Redirect", "/login/")
 
 	default:
-		fmt.Fprintf(w, "only get and post methods are supported")
-		return
+		h.lg.Error("Only GET and POST methods are supported")
+		http.Error(w, "Only GET and POST methods are supported", http.StatusMethodNotAllowed)
 	}
 }
 

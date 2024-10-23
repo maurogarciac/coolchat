@@ -30,7 +30,7 @@ htmx.defineExtension("ws-html-response", {
 
         // Format time from message
 
-        var date = new Date(response.sent);
+        var date = new Date(response.ts);
         var dayom = String(date.getDate() + " " + getMonthString(date.getUTCMonth()))
         var hours = String(date.getUTCHours()).padStart(2, '0');
         var minutes = String(date.getUTCMinutes()).padStart(2, '0');

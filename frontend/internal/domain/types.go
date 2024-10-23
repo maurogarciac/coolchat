@@ -10,8 +10,14 @@ type LoginResult struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+type Message struct {
+	Text      string `json:"text"`
+	User      string `json:"user"`
+	Timestamp string `json:"ts"`
+}
+
 type MessageHistoryResult struct {
-	Messages []byte
+	Messages []Message
 }
 
 type RefreshToken struct {

@@ -107,9 +107,9 @@ func (s *ChatServer) broadcastMessage(message []byte) error {
 	s.lg.Infof("Message content: %s", messageContent)
 
 	returnMessage := ReturnMessage{
-		Text: messageContent.Text,
-		User: messageContent.User,
-		Sent: time.Now(),
+		Text:      messageContent.Text,
+		User:      messageContent.User,
+		Timestamp: time.Now(),
 	}
 
 	var outgoingEvent Event

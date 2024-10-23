@@ -145,10 +145,14 @@ func (p *BackendApi) GetMessageHistory(ctx context.Context) (domain.MessageHisto
 		return domain.MessageHistoryResult{}, fmt.Errorf("backend-api GET messages read resp error: %w", err)
 	}
 
-	var valueResp MessageHistoryResponse
-	err = json.Unmarshal(respBody, &valueResp) // Convert values to local type
+	var messageList []domain.Message
+	err = json.Unmarshal(respBody, &messageList) // Convert values to local type
 	if err != nil {
 		return domain.MessageHistoryResult{}, fmt.Errorf("backend-api GET messages unmarshal resp error: %w", err)
+	}
+
+	valueResp := MessageHistoryResponse{
+		Messages: messageList,
 	}
 
 	return valueResp.MessageHistoryResult(), nil

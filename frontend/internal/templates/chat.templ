@@ -1,11 +1,25 @@
 package templates
 
-templ ChatBox(username string) {
+import (
+    d "frontend/internal/domain"
+)
+
+templ ChatBox(username string, messages d.MessageHistoryResult) {
 
 <div id="chat">
     <h2> CoolChat 😎 </h2>
     <div id="chatbox-wrapper" hx-ext="ws,ws-html-response" ws-connect="ws://localhost:1337/ws" ws-target="#chatbox" hx-on:htmx:ws-after-message="document.querySelector('#form').reset()">
-        <div id="chatbox"></div>
+        <div id="chatbox">
+            // for _, message := range messages {
+            //     <div class="right" id="message">
+            //     <div id="msg-headers">
+            //         <div id="sent-by"> { bob ": " }</div>
+            //         <div id="time-sent">23 Oct - 14:43</div>
+            //     </div>
+            //     <div id="msg-content"> { message }</div>
+            // </div>
+            // }
+        </div>
         <form id="form" hx-trigger="submit" ws-send>
             <input type="text" name="message" autocomplete="off" placeholder={"Got something to say, " + username + "?"}></input>
             <input type="submit" value="Send"></input>
@@ -13,3 +27,5 @@ templ ChatBox(username string) {
     </div>
 </div>
 }
+
+

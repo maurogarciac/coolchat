@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -75,7 +74,7 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/home", http.StatusMovedPermanently)
 	default:
-		fmt.Fprintf(w, "only get and post methods are supported")
-		return
+		h.lg.Error("Only GET and POST methods are supported")
+		http.Error(w, "Only GET and POST method aer supported", http.StatusMethodNotAllowed)
 	}
 }
