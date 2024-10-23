@@ -13,10 +13,10 @@ type MessageHistory struct {
 }
 
 type Message struct {
-	ID        string
-	Text      string
-	From      string
-	Timestamp time.Time
+	ID        string    `json:"id"`
+	Text      string    `json:"text"`
+	From      string    `json:"user"`
+	Timestamp time.Time `json:"ts"`
 }
 
 type InsertMessage struct {
