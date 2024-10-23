@@ -5,7 +5,6 @@ import (
 	"backend/internal/domain"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -51,24 +50,22 @@ func NewChatServer(logger *zap.SugaredLogger, database *db.DbProvider) *ChatServ
 
 func (s *ChatServer) setupEventHandlers() {
 	s.handlers[SendMessage] = func(e Event, c *Client) error {
-		fmt.Println(e)
+		s.lg.Debug(e)
 		return nil
 	}
 }
 
 // Handler that allows ws connections
 func (s *ChatServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Println("New connection")
+	s.lg.Info("New connection")
 
 	conn, err := upgrader.Upgrade(w, r, nil) // Upgrade http connection to ws
 	if err != nil {
-		log.Println(err)
+		s.lg.Error(err)
 		return
 	}
 
-	user := "cooltestuser" // User message text to get user
-
-	client := NewClient(s.lg, user, conn, s)
+	client := NewClient(s.lg, conn, s)
 	s.addClient(client)
 
 	go client.readMessages()
@@ -92,15 +89,28 @@ func (s *ChatServer) removeClient(client *Client) {
 	}
 }
 
-func (s *ChatServer) broadcastMessage(message []byte, user string) error {
+func (s *ChatServer) broadcastMessage(message []byte) error {
 	s.lg.Debug("new message broadcasted")
 
-	var returnMessage EgressMessageEvent
-	if err := json.Unmarshal(message, &returnMessage); err != nil {
+	var recievedMessage RecievedEgressMessage
+	if err := json.Unmarshal(message, &recievedMessage); err != nil {
 		return fmt.Errorf("bad payload in request: %v", err)
 	}
-	returnMessage.User = user
-	returnMessage.Sent = time.Now()
+
+	s.lg.Debugf("Recieved msg: %s", recievedMessage)
+
+	var messageContent InnerMessage
+	if err := json.Unmarshal([]byte(recievedMessage.Message), &messageContent); err != nil {
+		return fmt.Errorf("error in message content in request: %v", err)
+	}
+
+	s.lg.Infof("Message content: %s", messageContent)
+
+	returnMessage := ReturnMessage{
+		Text: messageContent.Text,
+		User: messageContent.User,
+		Sent: time.Now(),
+	}
 
 	var outgoingEvent Event
 	data, err := json.Marshal(returnMessage)
@@ -116,7 +126,6 @@ func (s *ChatServer) broadcastMessage(message []byte, user string) error {
 
 	if s.db == nil {
 		errStr := "could not save message. database connection is not initialized"
-		s.lg.Error(errStr)
 		return fmt.Errorf("%s", errStr)
 	}
 	if _, err := s.db.InsertMessage(msg); err != nil {

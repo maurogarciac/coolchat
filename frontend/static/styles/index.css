@@ -55,13 +55,14 @@ body {
     align-items: none;
 
     width: 90%;
+
+    padding: 3px 8px;
     
     #msg-headers {
         display: flex;
         flex-direction: row;
 
     }
-
 }
 
 .left {

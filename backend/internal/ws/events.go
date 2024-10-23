@@ -11,12 +11,21 @@ const (
 
 type EventHandler func(event Event, c *Client) error
 
-type Event struct {
+type InnerMessage struct {
+	Text string `json:"text"`
+	User string `json:"user"`
+}
+
+type RecievedEgressMessage struct {
 	Message string `json:"message"`
 }
 
-type EgressMessageEvent struct {
-	Text string    `json:"message"`
+type ReturnMessage struct {
+	Text string    `json:"text"`
 	User string    `json:"user"`
 	Sent time.Time `json:"sent"`
+}
+
+type Event struct {
+	Message string `json:"message"`
 }

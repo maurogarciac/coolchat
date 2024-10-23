@@ -40,7 +40,7 @@ htmx.defineExtension("ws-html-response", {
 
         // Actual message text
         var msgContentDiv = document.createElement("div")
-        msgContentDiv.textContent = `${response.message}`
+        msgContentDiv.textContent = `${response.text}`
         msgContentDiv.id = "msg-content"
 
         chatbox.appendChild(messageDiv)
@@ -51,8 +51,7 @@ htmx.defineExtension("ws-html-response", {
 
 // Update ws message using new structure that includes username
 document.addEventListener("htmx:wsConfigSend", function (event) {
-    
-    var newMessage = JSON.stringify({ message: event.detail.parameters.message, user: getUsername() })
+    var newMessage = JSON.stringify({ text: event.detail.parameters.message, user: getUsername() })
     event.detail.parameters.message = newMessage
     console.log(event)
 })

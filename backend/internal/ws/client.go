@@ -2,7 +2,6 @@ package ws
 
 import (
 	"encoding/json"
-	"log"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -12,7 +11,6 @@ import (
 type ClientList map[*Client]bool
 
 type Client struct {
-	user   string
 	conn   *websocket.Conn
 	server *ChatServer
 	egress chan Event
@@ -23,9 +21,8 @@ var (
 	pingInterval = (pongWait * 9) / 10
 )
 
-func NewClient(logger *zap.SugaredLogger, username string, connection *websocket.Conn, chatServer *ChatServer) *Client {
+func NewClient(logger *zap.SugaredLogger, connection *websocket.Conn, chatServer *ChatServer) *Client {
 	return &Client{
-		user:   username,
 		conn:   connection,
 		server: chatServer,
 		egress: make(chan Event),
@@ -45,7 +42,7 @@ func (c *Client) readMessages() {
 	c.conn.SetPongHandler(c.pongHandler)
 
 	for {
-		_, message, err := c.conn.ReadMessage()
+		_, payload, err := c.conn.ReadMessage()
 
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
@@ -53,9 +50,9 @@ func (c *Client) readMessages() {
 			}
 			break
 		}
-		c.server.lg.Infof("Payload: %s", string(message))
+		c.server.lg.Infof("Payload: %s", string(payload))
 
-		if err := c.server.broadcastMessage(message, c.user); err != nil {
+		if err := c.server.broadcastMessage(payload); err != nil {
 			c.server.lg.Error(err)
 			return
 		}
@@ -94,8 +91,8 @@ func (c *Client) writeMessages() {
 			if err := c.conn.WriteMessage(websocket.TextMessage, data); err != nil {
 				c.server.lg.Error(err)
 			}
-			log.Println("Sent message" + string(data))
-			// todo add to db here
+			c.server.lg.Infof("Sent message: %s", string(data))
+
 		case <-ticker.C:
 			c.server.lg.Debug("ping")
 			if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
