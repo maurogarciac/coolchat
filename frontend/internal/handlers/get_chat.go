@@ -34,9 +34,9 @@ func (h ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Could not fetch message history", http.StatusInternalServerError)
 	}
 
-	h.lg.Info(messageHistory.Messages)
+	h.lg.Debugf("Message history result: %s", messageHistory.Messages)
 
-	c := templates.ChatBox(user)
+	c := templates.ChatBox(user, messageHistory)
 
 	switch r.Method {
 

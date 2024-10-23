@@ -1,24 +1,28 @@
 package templates
 
-import (
-    d "frontend/internal/domain"
-)
+import "fmt"
+import "time"
 
-templ ChatBox(username string, messages d.MessageHistoryResult) {
+import d "frontend/internal/domain"
+
+
+templ ChatBox(username string, msgResult d.MessageHistoryResult) {
 
 <div id="chat">
     <h2> CoolChat 😎 </h2>
     <div id="chatbox-wrapper" hx-ext="ws,ws-html-response" ws-connect="ws://localhost:1337/ws" ws-target="#chatbox" hx-on:htmx:ws-after-message="document.querySelector('#form').reset()">
         <div id="chatbox">
-            // for _, message := range messages {
-            //     <div class="right" id="message">
-            //     <div id="msg-headers">
-            //         <div id="sent-by"> { bob ": " }</div>
-            //         <div id="time-sent">23 Oct - 14:43</div>
-            //     </div>
-            //     <div id="msg-content"> { message }</div>
-            // </div>
-            // }
+            for _, message := range msgResult.Messages {
+                if message.User == username {
+                    <div class="right" id="message">
+                        @messageContent(message.User, message.Timestamp, message.Text)
+                    </div>
+                } else {
+                    <div class="left" id="message">
+                        @messageContent(message.User, message.Timestamp, message.Text)
+                    </div>
+                }
+            }
         </div>
         <form id="form" hx-trigger="submit" ws-send>
             <input type="text" name="message" autocomplete="off" placeholder={"Got something to say, " + username + "?"}></input>
@@ -29,3 +33,21 @@ templ ChatBox(username string, messages d.MessageHistoryResult) {
 }
 
 
+templ messageContent(user string, timestamp string, text string) {
+    <div id="msg-headers">
+        <div id="sent-by"> { user + ": " }</div>
+        <div id="time-sent"> { formatDate(timestamp) } </div>
+    </div>
+    <div id="msg-content"> { text }</div>
+}
+
+
+func formatDate(input string) string {
+	t, err := time.Parse(time.RFC3339, input)
+	if err != nil {
+		fmt.Print(err)
+	}
+
+	formatted := t.Format("Jan 2 - 11:06:39")
+	return formatted
+}

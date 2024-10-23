@@ -2,6 +2,7 @@ package api
 
 import (
 	"frontend/internal/domain"
+	"log"
 )
 
 // Login
@@ -61,6 +62,8 @@ type MessageHistoryResponse struct {
 }
 
 func (r *MessageHistoryResponse) MessageHistoryResult() domain.MessageHistoryResult {
+
+	log.Print(r.Messages[0])
 
 	return domain.MessageHistoryResult{
 		Messages: r.Messages,
