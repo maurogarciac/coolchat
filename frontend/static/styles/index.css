@@ -55,14 +55,23 @@ body {
     align-items: none;
 
     width: 90%;
-    margin: 0 0 0 10%;
-
+    
     #msg-headers {
         display: flex;
         flex-direction: row;
 
     }
 
+}
+
+.left {
+    background-color: gray;
+    margin: 0 10% 0 0;
+}
+
+.right {
+    background-color: #007bff;
+    margin: 0 0 0 10%;
 }
 
 #chatbox {

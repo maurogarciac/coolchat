@@ -34,6 +34,13 @@ func AuthRequired(next http.Handler, b services.BackendService, secretKey string
 
 		var claims *Claims
 		var err error
+
+		if accessToken == "" && refreshToken == "" {
+			log.Default().Print("Missing both tokens")
+			http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
+			return
+		}
+
 		if accessToken != "" {
 			// Parse and validate the token
 			claims, err = VerifyAccessToken(accessToken, secretKey)
@@ -42,12 +49,6 @@ func AuthRequired(next http.Handler, b services.BackendService, secretKey string
 				http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
 				return
 			}
-		}
-
-		if accessToken == "" && refreshToken == "" {
-			log.Default().Print("Missing both tokens")
-			http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
-			return
 		}
 
 		if accessToken == "" && refreshToken != "" {

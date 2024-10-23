@@ -33,13 +33,13 @@ templ PageHeaders() {
 templ NavBar(hasToken bool) {
 <div id="nav">
 
-    @NavButton("/home",  "Home")
-    @NavButton("/chat",  "Chat App")
+    @NavButton("/home/",  "Home")
+    @NavButton("/chat/",  "Chat App")
 
     if hasToken {
-        @NavButton("/logout",  "Log out")
+        @NavButton("/logout/",  "Log out")
     } else {
-        @NavButton("/login", "Log in")
+        @NavButton("/login/", "Log in")
     }
 
 </div>

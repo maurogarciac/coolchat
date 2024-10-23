@@ -1,18 +1,21 @@
-
 htmx.defineExtension("ws-html-response", {
     transformResponse : function(text, xhr, elt) {
 
-      
         var response = JSON.parse(JSON.parse(text).message)
-        console.log(response)
+
         var chatbox = document.getElementById("chatbox")
     
         // Full message div
         var messageDiv= document.createElement("div")
-        // if presponse.user === me, div class="message-mine" with align right and bgcolor dark blue
-        // else div class="other"
-        messageDiv.id = "message"
 
+        console.log(response)
+        if (response.user === getUsername()) {
+            messageDiv.className = "right"
+        } else {
+            messageDiv.className = "left"
+        }
+        messageDiv.id = "message"
+    
         // Header for user and timestamp
         var msgHeaderDiv = document.createElement("div")
         msgHeaderDiv.id = "msg-headers"
@@ -24,11 +27,18 @@ htmx.defineExtension("ws-html-response", {
 
         var timeSent = document.createElement("div")
         timeSent.id = "time-sent" 
-        timeSent.textContent = `${response.sent}`
+
+        // Format time from message
+
+        var date = new Date(response.sent);
+        var dayom = String(date.getDate() + " " + getMonthString(date.getUTCMonth()))
+        var hours = String(date.getUTCHours()).padStart(2, '0');
+        var minutes = String(date.getUTCMinutes()).padStart(2, '0');
+        
+        timeSent.textContent = `${dayom} - ${hours}:${minutes}`
         msgHeaderDiv.appendChild(timeSent)
 
         // Actual message text
-        
         var msgContentDiv = document.createElement("div")
         msgContentDiv.textContent = `${response.message}`
         msgContentDiv.id = "msg-content"
@@ -39,20 +49,31 @@ htmx.defineExtension("ws-html-response", {
     }
 })
 
+// Update ws message using new structure that includes username
 document.addEventListener("htmx:wsConfigSend", function (event) {
-   console.log(event.detail.data)
+    
+    var newMessage = JSON.stringify({ message: event.detail.parameters.message, user: getUsername() })
+    event.detail.parameters.message = newMessage
+    console.log(event)
 })
 
+// Get username from placeholder value in form
+function getUsername(){
+    var formInput = document.querySelector('#form input[name="message"]')
+    var placeholderText = formInput.getAttribute('placeholder')
 
-    // function getCookieByName(name) {
-    //     const cookies = document.cookie.split(";");
-    //     for (let cookie of cookies) {
-    //         cookie = cookie.trim();
-    //         if (cookie.startsWith(name + "=")) {
-    //             return cookie.substring(name.length + 1);
-    //         }
-    //     }
-    //     return null;
-    // }
+    // Match text found after comma until question mark :)
+    const regex = /,\s*([^?]+)\?/ 
     
-    // console.log(getCookieByName("user"));
+    return placeholderText.match(regex)[1].trim() 
+}
+
+// Get short month string
+function getMonthString(monthIndex){
+    const monthNames = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ]
+    
+    return monthNames[monthIndex]
+}
