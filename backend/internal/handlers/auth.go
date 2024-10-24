@@ -28,19 +28,19 @@ func RefreshAccessToken(
 	jwtRefreshSecretKey string) (string, error) {
 
 	if tokenStr == "" {
-		http.Error(w, "Missing refresh token", http.StatusBadRequest)
-		return "", fmt.Errorf("missing refresh token")
+		http.Error(w, "Missing refresh_token", http.StatusBadRequest)
+		return "", fmt.Errorf("missing refresh_token")
 	}
 
 	claims, err := verifyRefreshToken(tokenStr, jwtRefreshSecretKey)
 	if err != nil {
-		http.Error(w, "Invalid refresh token", http.StatusBadRequest)
-		return "", fmt.Errorf("invalid refresh token")
+		http.Error(w, "Invalid refresh_token", http.StatusBadRequest)
+		return "", fmt.Errorf("invalid refresh_token")
 	}
 
 	newToken, err := GenerateAccessToken(claims.Username, jwtSecretKey)
 	if err != nil {
-		http.Error(w, "Could not generate access token", http.StatusInternalServerError)
+		http.Error(w, "Could not generate access_token", http.StatusInternalServerError)
 		return "", err
 	}
 	return newToken, nil
@@ -84,7 +84,7 @@ func GenerateTokens(
 	refreshToken, err := jwt.NewWithClaims(
 		jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(jwtRefreshSecretKey))
 	if err != nil {
-		return "", "", fmt.Errorf("refresh token generation error: %w", err)
+		return "", "", fmt.Errorf("refresh_token generation error: %w", err)
 	}
 
 	return accessToken, refreshToken, nil
@@ -106,7 +106,7 @@ func GenerateAccessToken(username string, jwtSecretKey string) (string, error) {
 	accessToken, err := jwt.NewWithClaims(
 		jwt.SigningMethodHS256, accessClaims).SignedString([]byte(jwtSecretKey))
 	if err != nil {
-		return "", fmt.Errorf("access token generation error: %w", err)
+		return "", fmt.Errorf("access_token generation error: %w", err)
 	}
 
 	return accessToken, nil

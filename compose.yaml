@@ -56,6 +56,7 @@ services:
     depends_on:
       cc-db:
         condition: service_healthy
+      # remove db dependency if backend healthcheck is fixed
       # cc-backend:
       #   condition: service_healthy
 
