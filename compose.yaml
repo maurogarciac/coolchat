@@ -6,7 +6,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
-      - db/.env.docker
+      - .env.docker
     environment:
       - DB_AND_USER=postgres
     ports:
@@ -26,8 +26,7 @@ services:
     ports:
       - "1337:1337"
     env_file:
-      - backend/.env
-      - backend/.env.docker
+      - .env.docker
     restart: unless-stopped
     # healthcheck: # Scratch images don't have wget or curl, need to create health-check binary or smth
     #   test:  ["CMD", "wget", "--spider", "-q", "localhost:1337/health"]
@@ -48,8 +47,7 @@ services:
     ports:
       - "8000:8000"
     env_file:
-      - frontend/.env
-      - frontend/.env.docker
+      - .env.docker
     restart: unless-stopped
     networks:
       - coolchat-network 

@@ -31,7 +31,7 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	redirect_link := "/home/"
 
-	c := templates.LogIn()
+	c := templates.LogIn(false)
 
 	switch r.Method {
 
@@ -63,6 +63,9 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		res, err := h.b.PostLogin(h.ctx, login_creds)
 		if err != nil {
 			h.lg.Error("Could not authenticate user")
+			templates.LogIn(true).Render(h.ctx, w)
+			// w.Header().Set("HX-Redirect", "/login/")
+			return
 		}
 
 		auth.SetTokenCookie(

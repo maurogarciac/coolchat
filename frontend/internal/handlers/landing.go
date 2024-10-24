@@ -18,11 +18,13 @@ func NewLandingHandler(logger *zap.SugaredLogger) *LandingHandler {
 
 func (h LandingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
+	redirect_link := "/home/"
+
 	switch r.Method {
 
 	case http.MethodGet:
 
-		w.Header().Set("HX-Redirect", "/home?partial=true")
+		w.Header().Set("HX-Redirect", redirect_link)
 
 	default:
 		h.lg.Error("Only GET method is supported")

@@ -1,20 +1,40 @@
 package templates
 
-templ LogIn() {
-<h1> Welcome to CoolChat 😎 </h1> 
+templ LogIn(has_error bool) {
+<h1> Welcome to CoolChat 😎 </h1>
 
 <div id="login">
     <h2>Sign in</h2>
     <form hx-post="/login/" hx-trigger="click" hx-target="#main" hx-swap="innerHTML">
 
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required></input>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required></input>
-
-        <button>Log in</button>
+    @loginInputs(has_error)
+    <button>Log in</button>
 
     </form>
 </div>
+}
+
+templ loginInputs(has_error bool) {
+        if has_error {
+        @labelUsername()
+        <input type="text" id="username" name="username" class="error" required></input>
+
+        @labelPassword()
+        <input type="password" id="password" name="password" class="error" required></input>
+        <div id="error-message">Invalid username or password. Try again.</div>
+        } else {
+        @labelUsername()
+        <input type="text" id="username" name="username" required></input>
+
+        @labelPassword()
+        <input type="password" id="password" name="password" required></input>
+        }
+}
+
+templ labelUsername(){
+<label for="username">Username:</label>
+}
+
+templ labelPassword(){
+<label for="password">Password:</label>
 }

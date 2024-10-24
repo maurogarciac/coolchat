@@ -31,7 +31,6 @@ func AuthRequired(next http.Handler, b services.BackendService, secretKey string
 
 		referer := r.Header.Get("Referer")
 
-		// Check if there's no referer or it's not from same site
 		if referer == "" || !strings.Contains(referer, "localhost:8000") {
 			redirect_link = "/login/"
 		}

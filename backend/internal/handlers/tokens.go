@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	"backend/config"
 	d "backend/internal/domain"
@@ -91,6 +92,7 @@ func (h *JwtHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 
+		user_candidate.Username = strings.ToLower(user_candidate.Username)
 		h.lg.Info("User candidate: ", user_candidate)
 
 		// Check if user credentials are valid

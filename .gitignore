@@ -119,6 +119,9 @@ venv.bak/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
+# VsCode
+.vscode/
+
 # Reports
 automation/reports/*.html
 automation/reports/*.xml

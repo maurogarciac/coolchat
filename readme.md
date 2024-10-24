@@ -5,19 +5,17 @@ Make sure to put on some sunglasses before you connect and start yapping! (backg
 
 # How to run:
 
-1. Make sure you have docker 27.1 installed!
+1. Make sure you have docker 27.1 installed! (or compatible version)
 
-2. Copy the contents of .env.example into a file named .env
-
-3. Copy the contents of .env.docker.example into a file named .env.docker
+2. Copy the contents of .env.docker.example into a file named .env.docker
 
 4. You will have to create a docker network, run:
 ``` docker network create coolchat-network ```
 
-5. In the root directory of the project, run:
+5. Now, in the root directory of the project, run:
 ```docker compose up -d```
 
-This will create all images and spin up all containers and they should connect automatically (unless some of their preconfigured ports are in use by the host machine)
+This will create all images and spin up all containers and they should connect automatically (unless some of their pre-configured ports are in use by the host machine)
 
 The preconfigured ports are:
     - Frontend : 8000
