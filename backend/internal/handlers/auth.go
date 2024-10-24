@@ -28,13 +28,13 @@ func RefreshAccessToken(
 	jwtRefreshSecretKey string) (string, error) {
 
 	if tokenStr == "" {
-		http.Error(w, "Missing refresh token", http.StatusUnauthorized)
+		http.Error(w, "Missing refresh token", http.StatusBadRequest)
 		return "", fmt.Errorf("missing refresh token")
 	}
 
 	claims, err := verifyRefreshToken(tokenStr, jwtRefreshSecretKey)
 	if err != nil {
-		http.Error(w, "Invalid refresh token", http.StatusUnauthorized)
+		http.Error(w, "Invalid refresh token", http.StatusBadRequest)
 		return "", fmt.Errorf("invalid refresh token")
 	}
 
@@ -51,8 +51,9 @@ func verifyRefreshToken(tokenStr string, jwtRefreshSecretKey string) (*Claims, e
 
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtRefreshSecretKey, nil
+		return []byte(jwtRefreshSecretKey), nil
 	})
+
 	if err != nil || !token.Valid {
 		return nil, err
 	}
@@ -76,6 +77,8 @@ func GenerateTokens(
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(refreshExpiration),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now().Add(10 * time.Millisecond)),
 		},
 	}
 	refreshToken, err := jwt.NewWithClaims(
@@ -95,6 +98,8 @@ func GenerateAccessToken(username string, jwtSecretKey string) (string, error) {
 		Username: username,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(accessExpiration),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+			NotBefore: jwt.NewNumericDate(time.Now().Add(10 * time.Millisecond)),
 		},
 	}
 

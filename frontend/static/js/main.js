@@ -1,3 +1,10 @@
+// Scroll to the bottom of chat on first load
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.location.pathname.includes("/chat")) {
+        scrollToBottom();
+    }
+});
+
 htmx.defineExtension("ws-html-response", {
     transformResponse : function(text, xhr, elt) {
 
@@ -6,9 +13,12 @@ htmx.defineExtension("ws-html-response", {
         var chatbox = document.getElementById("chatbox")
     
         // Full message div
-        var messageDiv= document.createElement("div")
 
-        console.log(response)
+        var msgWrapperDiv = document.createElement("div")
+        msgWrapperDiv.id = "message-wrapper"
+
+        var messageDiv = document.createElement("div")
+
         if (response.user === getUsername()) {
             messageDiv.className = "right"
         } else {
@@ -43,9 +53,12 @@ htmx.defineExtension("ws-html-response", {
         msgContentDiv.textContent = `${response.text}`
         msgContentDiv.id = "msg-content"
 
-        chatbox.appendChild(messageDiv)
+        chatbox.appendChild(msgWrapperDiv)
+        msgWrapperDiv.appendChild(messageDiv)
         messageDiv.appendChild(msgHeaderDiv)
         messageDiv.appendChild(msgContentDiv)
+
+        scrollToBottom()
     }
 })
 
@@ -53,7 +66,6 @@ htmx.defineExtension("ws-html-response", {
 document.addEventListener("htmx:wsConfigSend", function (event) {
     var newMessage = JSON.stringify({ text: event.detail.parameters.message, user: getUsername() })
     event.detail.parameters.message = newMessage
-    console.log(event)
 })
 
 // Get username from placeholder value in form
@@ -75,4 +87,9 @@ function getMonthString(monthIndex){
     ]
     
     return monthNames[monthIndex]
+}
+
+function scrollToBottom(){
+    var elem = document.getElementById('chatbox');
+    elem.scrollTop = elem.scrollHeight;
 }

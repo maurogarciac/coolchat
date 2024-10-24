@@ -13,6 +13,7 @@ templ ChatBox(username string, msgResult d.MessageHistoryResult) {
     <div id="chatbox-wrapper" hx-ext="ws,ws-html-response" ws-connect="ws://localhost:1337/ws" ws-target="#chatbox" hx-on:htmx:ws-after-message="document.querySelector('#form').reset()">
         <div id="chatbox">
             for _, message := range msgResult.Messages {
+                <div id="message-wrapper">
                 if message.User == username {
                     <div class="right" id="message">
                         @messageContent(message.User, message.Timestamp, message.Text)
@@ -22,6 +23,7 @@ templ ChatBox(username string, msgResult d.MessageHistoryResult) {
                         @messageContent(message.User, message.Timestamp, message.Text)
                     </div>
                 }
+                </div>
             }
         </div>
         <form id="form" hx-trigger="submit" ws-send>
@@ -48,6 +50,6 @@ func formatDate(input string) string {
 		fmt.Print(err)
 	}
 
-	formatted := t.Format("Jan 2 - 11:06:39")
+	formatted := t.Format("Jan 2 - 11:06")
 	return formatted
 }

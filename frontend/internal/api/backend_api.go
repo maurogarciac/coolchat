@@ -66,11 +66,11 @@ func (p *BackendApi) PostLogin(ctx context.Context, input domain.User) (domain.L
 	}
 
 	var loginResp PostLoginResponse
-	err = json.Unmarshal(respBody, &loginResp) // Convert values to local type
+	err = json.Unmarshal(respBody, &loginResp) // Convert login values to local type
 	if err != nil {
 		return domain.LoginResult{}, fmt.Errorf("backend-api POST login unmarshal resp error: %w", err)
 	}
-	p.lg.Info(loginResp)
+	p.lg.Debug(loginResp)
 	return loginResp.PostLoginResult(), nil
 }
 
@@ -110,11 +110,11 @@ func (p *BackendApi) PostRefresh(ctx context.Context, input domain.RefreshToken)
 	}
 
 	var refreshResp PostRefreshResponse
-	err = json.Unmarshal(respBody, &refreshResp) // Convert values to local type
+	err = json.Unmarshal(respBody, &refreshResp) // Convert refresh values to local type
 	if err != nil {
 		return domain.RefreshResult{}, fmt.Errorf("backend-api POST token refresh unmarshal resp error: %w", err)
 	}
-	p.lg.Info(refreshResp)
+	p.lg.Debug(refreshResp)
 	return refreshResp.PostRefreshResult(), nil
 }
 
@@ -146,14 +146,14 @@ func (p *BackendApi) GetMessageHistory(ctx context.Context) (domain.MessageHisto
 	}
 
 	var messageList []domain.Message
-	err = json.Unmarshal(respBody, &messageList) // Convert values to local type
+	err = json.Unmarshal(respBody, &messageList) // Convert message values to local type
 	if err != nil {
 		return domain.MessageHistoryResult{}, fmt.Errorf("backend-api GET messages unmarshal resp error: %w", err)
 	}
 
-	valueResp := MessageHistoryResponse{
+	messageResp := MessageHistoryResponse{
 		Messages: messageList,
 	}
-
-	return valueResp.MessageHistoryResult(), nil
+	p.lg.Debug(messageResp)
+	return messageResp.MessageHistoryResult(), nil
 }

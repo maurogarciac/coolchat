@@ -38,6 +38,7 @@ type RefreshRequest struct {
 }
 
 func toBackendApiRefreshRequest(input domain.RefreshToken) RefreshRequest {
+
 	return RefreshRequest{
 		RefreshToken: input.Token,
 	}

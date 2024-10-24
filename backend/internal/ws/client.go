@@ -96,7 +96,7 @@ func (c *Client) writeMessages() {
 		case <-ticker.C:
 			c.server.lg.Debug("ping")
 			if err := c.conn.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				c.server.lg.Errorf("writemsg: ", err)
+				c.server.lg.Errorf("write message error: %s", err)
 				return
 			}
 		}

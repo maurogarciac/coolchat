@@ -43,6 +43,7 @@ func (d *DbProvider) Close() {
 
 // SetupDatabase initializes the messages table.
 func (d *DbProvider) SetupDb() error {
+
 	_, err := d.pool.Exec(context.Background(),
 		`CREATE EXTENSION IF NOT EXISTS "pgcrypto";`+
 			`CREATE TABLE IF NOT EXISTS messages (
@@ -58,6 +59,7 @@ func (d *DbProvider) SetupDb() error {
 
 // Retrieves all messages ordered by timestamp.
 func (d *DbProvider) SelectAllMessages() (domain.MessageHistory, error) {
+
 	rows, err := d.pool.Query(d.ctx,
 		"SELECT id, username, message, timestamp FROM messages ORDER BY timestamp")
 	if err != nil {
@@ -79,8 +81,6 @@ func (d *DbProvider) SelectAllMessages() (domain.MessageHistory, error) {
 
 // Inserts a new message into the messages table.
 func (d *DbProvider) InsertMessage(msg domain.InsertMessage) (string, error) {
-
-	d.lg.Info("db pool: %+v\n", d.pool) // Check if db is nil
 
 	var id string
 	err := d.pool.QueryRow(d.ctx,

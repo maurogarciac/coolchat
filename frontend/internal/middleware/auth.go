@@ -6,6 +6,7 @@ import (
 	"frontend/internal/services"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -26,6 +27,15 @@ func AuthRequired(next http.Handler, b services.BackendService, secretKey string
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
+		redirect_link := "/login/?partial=true"
+
+		referer := r.Header.Get("Referer")
+
+		// Check if there's no referer or it's not from same site
+		if referer == "" || !strings.Contains(referer, "localhost:8000") {
+			redirect_link = "/login/"
+		}
+
 		ctx := r.Context()
 
 		// Extract tokens from cookies
@@ -37,7 +47,7 @@ func AuthRequired(next http.Handler, b services.BackendService, secretKey string
 
 		if accessToken == "" && refreshToken == "" {
 			log.Default().Print("Missing both tokens")
-			http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
+			http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 			return
 		}
 
@@ -46,27 +56,32 @@ func AuthRequired(next http.Handler, b services.BackendService, secretKey string
 			claims, err = VerifyAccessToken(accessToken, secretKey)
 			if err != nil {
 				log.Default().Print("Invalid or expired token")
-				http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
+				http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 				return
 			}
 		}
 
 		if accessToken == "" && refreshToken != "" {
 			// If access token expired but refresh token didn't, get new access token
-			log.Default().Print("Missing refresh token, getting new one")
+			log.Default().Print("Missing access token, refreshing")
+
 			newAccessToken, err := b.PostRefresh(ctx, domain.RefreshToken{Token: refreshToken})
 			if err != nil {
-				log.Default().Print("Error ocurred getting access token from backend")
-				http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
+				log.Default().Printf("Error ocurred getting access token from backend: %s", err)
+				http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 			}
+
 			claims, err = VerifyAccessToken(newAccessToken.AccessToken, secretKey)
 			if err != nil {
 				log.Default().Print("Invalid or expired token")
-				// w.Header().Set("HX-Redirect", "/login?partial=true")
-				http.Redirect(w, r, "/login/", http.StatusMovedPermanently)
+				http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 				return
 			}
 
+			SetTokenCookie(
+				AccessTokenCookieName,
+				newAccessToken.AccessToken,
+				time.Now().Add(15*time.Minute), w)
 		}
 
 		// Set the username in the request context

@@ -26,14 +26,34 @@ func NewRefreshTokenHandler(logger *zap.SugaredLogger, config *config.AppConfig)
 
 func (h *RefreshTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	err := r.ParseForm()
+	var token d.RefreshToken
+	err := json.NewDecoder(r.Body).Decode(&token)
+
 	if err != nil {
-		h.lg.Error(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 
-	token := r.FormValue("token")
+	h.lg.Debugf("Refresh token recieved: %s", token)
 
-	RefreshAccessToken(token, w, r, h.cfg.JwtSecretKey, h.cfg.JwtRefreshSecretKey)
+	access_token, err := RefreshAccessToken(token.RefreshToken, w, r, h.cfg.JwtSecretKey, h.cfg.JwtRefreshSecretKey)
+
+	if err != nil {
+		h.lg.Error("Error refreshing token: %s", err)
+		http.Error(w, "Could not refresh access_token", http.StatusUnauthorized)
+	}
+
+	if access_token != "" {
+
+		tokenJson, err := json.Marshal(d.AccessToken{AccessToken: access_token})
+		if err != nil {
+			h.lg.Error(err)
+		}
+		h.lg.Debugf("Access token json returned: %s", tokenJson)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(tokenJson)
+	}
 }
 
 // Full login JWT Handler

@@ -29,6 +29,8 @@ func NewLoginHandler(context context.Context, logger *zap.SugaredLogger, backend
 
 func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
+	redirect_link := "/home/"
+
 	c := templates.LogIn()
 
 	switch r.Method {
@@ -36,7 +38,8 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 
 		if auth.GetAccessToken(r) != "" {
-			http.Redirect(w, r, "/home/", http.StatusMovedPermanently)
+			w.Header().Set("HX-Redirect", redirect_link)
+			w.WriteHeader(http.StatusOK)
 		}
 
 		pageRender("login", c, false, h.lg, w, r)
@@ -72,7 +75,9 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			res.RefreshToken,
 			time.Now().Add(24*time.Hour), w)
 
-		http.Redirect(w, r, "/home", http.StatusMovedPermanently)
+		//http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
+		w.Header().Set("HX-Redirect", redirect_link)
+		w.WriteHeader(http.StatusOK)
 	default:
 		h.lg.Error("Only GET and POST methods are supported")
 		http.Error(w, "Only GET and POST method aer supported", http.StatusMethodNotAllowed)
