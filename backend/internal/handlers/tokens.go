@@ -35,30 +35,36 @@ func (h *RefreshTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		err := json.NewDecoder(r.Body).Decode(&token)
 
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			h.lg.Error(err)
+			http.Error(w, "Missing refresh_token", http.StatusBadRequest)
 		}
 
-		h.lg.Debugf("Refresh token recieved: %s", token)
+		if token.RefreshToken == "" {
+			http.Error(w, "Value for refresh_token is empty", http.StatusBadRequest)
+		} else {
+			h.lg.Debugf("Refresh token recieved: %s", token)
 
-		access_token, err := RefreshAccessToken(token.RefreshToken, w, r, h.cfg.JwtSecretKey, h.cfg.JwtRefreshSecretKey)
+			access_token, err := RefreshAccessToken(token.RefreshToken, w, r, h.cfg.JwtSecretKey, h.cfg.JwtRefreshSecretKey)
 
-		if err != nil {
-			h.lg.Errorf("Error refreshing token: %s", err)
-			http.Error(w, "Could not refresh access_token", http.StatusUnauthorized)
-		}
-
-		if access_token != "" {
-
-			tokenJson, err := json.Marshal(d.AccessToken{AccessToken: access_token})
 			if err != nil {
-				h.lg.Error(err)
+				h.lg.Errorf("Error refreshing token: %s", err)
+				http.Error(w, "Could not refresh access_token", http.StatusUnauthorized)
 			}
-			h.lg.Debugf("Access token json returned: %s", tokenJson)
 
-			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
-			w.Write(tokenJson)
+			if access_token != "" {
+
+				tokenJson, err := json.Marshal(d.AccessToken{AccessToken: access_token})
+				if err != nil {
+					h.lg.Error(err)
+				}
+				h.lg.Debugf("Access token json returned: %s", tokenJson)
+
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				w.Write(tokenJson)
+			}
 		}
+
 	default:
 		h.lg.Error("only post method is allowed")
 		http.Error(w, "Only POST method allowed", http.StatusMethodNotAllowed)
@@ -106,10 +112,14 @@ func (h *JwtHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		accepted := false
+
 		for _, u := range users {
 			if u.Username == user_candidate.Username && u.Password == user_candidate.Password {
 
+				accepted = true
 				h.lg.Infof("%s logged in!", u.Username)
+
 				var res d.LogInResponse
 				res.AccessToken, res.RefreshToken, err = GenerateTokens(
 					user_candidate.Username, h.cfg.JwtSecretKey, h.cfg.JwtRefreshSecretKey) // Generate JWT tokens in a cookie for the user
@@ -135,6 +145,11 @@ func (h *JwtHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				w.Write(resJson)
 			}
 		}
+		if !accepted {
+			h.lg.Error("user does not exist")
+			http.Error(w, "User does not exist", http.StatusForbidden)
+		}
+
 	default:
 		h.lg.Error("only post method is allowed")
 		http.Error(w, "Only POST method allowed", http.StatusMethodNotAllowed)
