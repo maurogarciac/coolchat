@@ -37,14 +37,22 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 
-		if auth.GetAccessToken(r) != "" {
+		h.lg.Info("Login GET")
+
+		token := auth.GetAccessToken(r)
+
+		if token != "" {
+			// Needs to use hx-redirect header for partial page rendering
 			w.Header().Set("HX-Redirect", redirect_link)
 			w.WriteHeader(http.StatusOK)
+			return
 		}
 
 		pageRender("login", c, false, h.lg, w, r)
 
 	case http.MethodPost:
+
+		h.lg.Infof("Login POST: %s", r.Body)
 
 		err := r.ParseForm()
 		if err != nil {
@@ -64,7 +72,6 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			h.lg.Error("Could not authenticate user")
 			templates.LogIn(true).Render(h.ctx, w)
-			// w.Header().Set("HX-Redirect", "/login/")
 			return
 		}
 
@@ -78,7 +85,6 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			res.RefreshToken,
 			time.Now().Add(24*time.Hour), w)
 
-		//http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 		w.Header().Set("HX-Redirect", redirect_link)
 		w.WriteHeader(http.StatusOK)
 	default:

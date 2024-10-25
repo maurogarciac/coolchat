@@ -17,3 +17,8 @@ rebuild-front:
 .PHONY: compose
 compose:
 	docker compose up -d 
+
+## kill: remove all containers, images and volumes
+.PHONY: compose
+kill:
+	docker compose down --rmi all --volumes

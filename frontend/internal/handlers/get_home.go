@@ -20,15 +20,18 @@ func NewHomeHandler(logger *zap.SugaredLogger) *HomeHandler {
 
 func (h HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
-	user, ok := r.Context().Value("User").(string)
-	if !ok {
-		h.lg.Error("Could not fetch username from context")
-	}
-
-	c := templates.Home(user)
-
 	switch r.Method {
+
 	case http.MethodGet:
+
+		h.lg.Info("Home GET")
+
+		user, ok := r.Context().Value("User").(string)
+		if !ok {
+			h.lg.Error("Could not fetch username from context")
+		}
+
+		c := templates.Home(user)
 
 		pageRender("home", c, true, h.lg, w, r)
 

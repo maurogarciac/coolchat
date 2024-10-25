@@ -45,13 +45,19 @@ func NewHTTPServer(
 func (s *HTTPServer) Start(ctx context.Context) {
 	s.lg.Infof("Starting web server on port %d", s.cfg.ServerPort)
 
+	a := m.AuthStuff{
+		Lg:        s.lg,
+		Back:      *s.b,
+		SecretKey: s.cfg.JwtSecretKey,
+	}
+
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	http.Handle("/", m.AuthRequired(handlers.NewLandingHandler(s.lg), *s.b, s.cfg.JwtSecretKey))
-	http.Handle("/home/", m.AuthRequired(handlers.NewHomeHandler(s.lg), *s.b, s.cfg.JwtSecretKey))
-	http.Handle("/chat/", m.AuthRequired(handlers.NewChatHandler(s.lg, *s.b), *s.b, s.cfg.JwtSecretKey))
+	http.Handle("/", m.AuthRequired(handlers.NewLandingHandler(s.lg), a))
+	http.Handle("/home/", m.AuthRequired(handlers.NewHomeHandler(s.lg), a))
+	http.Handle("/chat/", m.AuthRequired(handlers.NewChatHandler(s.lg, *s.b), a))
 	http.Handle("/login/", handlers.NewLoginHandler(ctx, s.lg, s.b))
-	http.Handle("/logout/", m.AuthRequired(handlers.NewLogoutHandler(s.lg), *s.b, s.cfg.JwtSecretKey))
+	http.Handle("/logout/", m.AuthRequired(handlers.NewLogoutHandler(s.lg), a))
 
 	err := s.server.ListenAndServe()
 	if errors.Is(err, http.ErrServerClosed) {

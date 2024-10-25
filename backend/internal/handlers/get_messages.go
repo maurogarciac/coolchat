@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"backend/internal/db"
+	"backend/internal/domain"
 	"encoding/json"
+	"time"
 
 	"net/http"
 
@@ -36,6 +38,15 @@ func (h *MessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 		}
 		h.lg.Debug(messages)
+
+		if len(messages.MessageList) < 1 {
+			m := domain.Message{
+				From:      "Mauro Garcia Coto",
+				Text:      "First message! You try now :)",
+				Timestamp: time.Now()}
+
+			messages.MessageList = append(messages.MessageList, m)
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)

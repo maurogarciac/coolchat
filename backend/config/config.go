@@ -9,7 +9,7 @@ type AppConfig struct {
 	DbPort              string        `env:"DB_PORT"              envDefault:"5432"`
 	DbUser              string        `env:"DB_USER"              envDefault:""`
 	DbPassword          string        `env:"DB_PASS"              envDefault:""`
-	DbName              string        `env:"DB_NAME"              envDefault:"postgres"`
+	DbName              string        `env:"DB_NAME"              envDefault:"coolchatdb"`
 	JwtSecretKey        string        `env:"JWT_SECRET"           envDefault:""`
 	JwtRefreshSecretKey string        `env:"RSH_SECRET"           envDefault:""`
 	ServerPort          int           `env:"BACKEND_PORT"         envDefault:"1337"`

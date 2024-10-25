@@ -34,6 +34,12 @@ type AuthTokens struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+type LogInResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	Username     string `json:"user"`
+}
+
 type RefreshToken struct {
 	RefreshToken string `json:"refresh_token"`
 }

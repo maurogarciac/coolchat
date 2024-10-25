@@ -21,6 +21,7 @@ func toBackendApiLoginRequest(input domain.User) LoginRequest {
 type PostLoginResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
+	User         string `json:"user"`
 }
 
 func (r *PostLoginResponse) PostLoginResult() domain.LoginResult {
@@ -28,6 +29,7 @@ func (r *PostLoginResponse) PostLoginResult() domain.LoginResult {
 	return domain.LoginResult{
 		AccessToken:  r.AccessToken,
 		RefreshToken: r.RefreshToken,
+		User:         r.User,
 	}
 }
 

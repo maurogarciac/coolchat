@@ -110,28 +110,29 @@ func (h *JwtHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if u.Username == user_candidate.Username && u.Password == user_candidate.Password {
 
 				h.lg.Infof("%s logged in!", u.Username)
-				var tokens d.AuthTokens
-				tokens.AccessToken, tokens.RefreshToken, err = GenerateTokens(
+				var res d.LogInResponse
+				res.AccessToken, res.RefreshToken, err = GenerateTokens(
 					user_candidate.Username, h.cfg.JwtSecretKey, h.cfg.JwtRefreshSecretKey) // Generate JWT tokens in a cookie for the user
 				if err != nil {
 					http.Error(w, "Could not generate tokens for the user",
 						http.StatusInternalServerError)
 					return
 				}
+				res.Username = u.Username
 
-				tokensJson, err := json.Marshal(tokens)
+				resJson, err := json.Marshal(res)
 				if err != nil {
 					http.Error(w, "Could not marshal json response",
 						http.StatusInternalServerError)
 					return
 				}
 
-				h.lg.Debug("Tokens: ", tokens)
-				h.lg.Debug("Tokens Json: ", tokensJson)
+				h.lg.Debug("Response: ", res)
+				h.lg.Debug("Tokens Json: ", resJson)
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)
-				w.Write(tokensJson)
+				w.Write(resJson)
 			}
 		}
 	default:

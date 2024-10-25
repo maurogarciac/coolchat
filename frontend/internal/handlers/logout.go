@@ -28,18 +28,20 @@ func (h LogoutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 
-		h.lg.Debug("logout GET: ", r.Body)
+		h.lg.Info("logout GET")
 
 		pageRender("logout", c, true, h.lg, w, r)
 
 	case http.MethodPost:
 
-		h.lg.Debug("logout POST: ", r.Body)
+		h.lg.Infof("logout POST: %s", r.Body)
 
 		deleteTokenCookie(middleware.AccessTokenCookieName, w)
 		deleteTokenCookie(middleware.RefreshTokenCookieName, w)
 
+		// Needs to use hx-redirect header for partial page rendering
 		w.Header().Set("HX-Redirect", "/login/")
+		w.WriteHeader(http.StatusOK)
 
 	default:
 		h.lg.Error("Only GET and POST methods are supported")

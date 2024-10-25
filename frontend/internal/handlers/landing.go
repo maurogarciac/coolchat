@@ -24,7 +24,9 @@ func (h LandingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	case http.MethodGet:
 
-		w.Header().Set("HX-Redirect", redirect_link)
+		h.lg.Info("Landing GET")
+
+		http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 
 	default:
 		h.lg.Error("Only GET method is supported")

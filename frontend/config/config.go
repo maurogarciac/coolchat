@@ -10,8 +10,8 @@ type AppConfig struct {
 }
 
 type HTTPConfig struct {
-	Timeout       time.Duration `env:"HTTP_CLIENT_TIMEOUT"   envDefault:"30s"`
-	RetryMax      int           `env:"HTTP_CLIENT_RETRY_MAX" envDefault:"3"`
+	Timeout       time.Duration `env:"HTTP_CLIENT_TIMEOUT"   envDefault:"1s"`
+	RetryMax      int           `env:"HTTP_CLIENT_RETRY_MAX" envDefault:"1"`
 	BackendAPIURL string        `env:"BACKEND_API_URL"       envDefault:"http://localhost:1337"`
 }
 

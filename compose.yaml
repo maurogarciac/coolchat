@@ -1,22 +1,18 @@
 services:
   cc-db:
-    build:
-      context: .
-      dockerfile: db/Dockerfile
+    image: postgres:latest
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - coolchatdb-data:/var/lib/postgresql/data/
     env_file:
       - .env.docker
-    environment:
-      - DB_AND_USER=postgres
     ports:
-      - "5432:5432"
+      - 5432:5432
     healthcheck:
-      test: pg_isready -d $${DB_AND_USER} -U $${DB_AND_USER}
+      test: pg_isready -d coolchatdb -U postgres
       interval: 2s
       retries: 10
     networks:
-      - coolchat-network 
+      - cc-network 
   cc-backend:
     build:
       context: .
@@ -24,7 +20,7 @@ services:
     volumes: 
       - .:/cc-backend
     ports:
-      - "1337:1337"
+      - 1337:1337
     env_file:
       - .env.docker
     restart: unless-stopped
@@ -34,7 +30,7 @@ services:
     #   retries: 5
     #   start_period: 5s  
     networks:
-      - coolchat-network 
+      - cc-network 
     depends_on:
       cc-db:
         condition: service_healthy
@@ -45,12 +41,12 @@ services:
     volumes:
       - .:/cc-frontend
     ports:
-      - "8000:8000"
+      - 8000:8000
     env_file:
       - .env.docker
     restart: unless-stopped
     networks:
-      - coolchat-network 
+      - cc-network 
     depends_on:
       cc-db:
         condition: service_healthy
@@ -59,8 +55,8 @@ services:
       #   condition: service_healthy
 
 volumes:
-  postgres_data:
+  coolchatdb-data:
 
 networks:
-  coolchat-network:
+  cc-network:
     driver: bridge

@@ -9,10 +9,7 @@ Make sure to put on some sunglasses before you connect and start yapping! (backg
 
 2. Copy the contents of .env.docker.example into a file named .env.docker
 
-4. You will have to create a docker network, run:
-``` docker network create coolchat-network ```
-
-5. Now, in the root directory of the project, run:
+3. Now, in the root directory of the project, run:
 ```docker compose up -d```
 
 This will create all images and spin up all containers and they should connect automatically (unless some of their pre-configured ports are in use by the host machine)

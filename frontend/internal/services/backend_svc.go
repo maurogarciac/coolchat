@@ -49,6 +49,7 @@ func (b *BackendService) PostRefresh(ctx context.Context, input domain.RefreshTo
 func (b *BackendService) GetMessageHistory(ctx context.Context) (domain.MessageHistoryResult, error) {
 
 	messages, err := b.backend.GetMessageHistory(ctx)
+
 	if err != nil {
 		return domain.MessageHistoryResult{}, err
 	}

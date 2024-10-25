@@ -4,12 +4,12 @@ import (
 	"context"
 	"frontend/internal/domain"
 	"frontend/internal/services"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"go.uber.org/zap"
 )
 
 const (
@@ -22,10 +22,18 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+type AuthStuff struct {
+	Lg        *zap.SugaredLogger
+	Back      services.BackendService
+	SecretKey string
+}
+
 // Middleware to validate JWT Access Tokens
-func AuthRequired(next http.Handler, b services.BackendService, secretKey string) http.Handler {
+func AuthRequired(next http.Handler, a AuthStuff) http.Handler {
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		a.Lg.Info("Going through the auth middleware")
 
 		redirect_link := "/login/?partial=true"
 
@@ -45,16 +53,16 @@ func AuthRequired(next http.Handler, b services.BackendService, secretKey string
 		var err error
 
 		if accessToken == "" && refreshToken == "" {
-			log.Default().Print("Missing both tokens")
+			a.Lg.Info("Missing both tokens")
 			http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 			return
 		}
 
 		if accessToken != "" {
 			// Parse and validate the token
-			claims, err = VerifyAccessToken(accessToken, secretKey)
+			claims, err = VerifyAccessToken(accessToken, a.SecretKey)
 			if err != nil {
-				log.Default().Print("Invalid or expired token")
+				a.Lg.Info("Invalid or expired token")
 				http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 				return
 			}
@@ -62,17 +70,17 @@ func AuthRequired(next http.Handler, b services.BackendService, secretKey string
 
 		if accessToken == "" && refreshToken != "" {
 			// If access token expired but refresh token didn't, get new access token
-			log.Default().Print("Missing access token, refreshing")
+			a.Lg.Info("Missing access token, refreshing")
 
-			newAccessToken, err := b.PostRefresh(ctx, domain.RefreshToken{Token: refreshToken})
+			newAccessToken, err := a.Back.PostRefresh(ctx, domain.RefreshToken{Token: refreshToken})
 			if err != nil {
-				log.Default().Printf("Error ocurred getting access token from backend: %s", err)
+				a.Lg.Info("Error ocurred getting access token from backend: %s", err)
 				http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 			}
 
-			claims, err = VerifyAccessToken(newAccessToken.AccessToken, secretKey)
+			claims, err = VerifyAccessToken(newAccessToken.AccessToken, a.SecretKey)
 			if err != nil {
-				log.Default().Print("Invalid or expired token")
+				a.Lg.Info("Invalid or expired token")
 				http.Redirect(w, r, redirect_link, http.StatusMovedPermanently)
 				return
 			}
