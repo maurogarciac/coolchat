@@ -1,4 +1,4 @@
-APP_NAME=ses-saas-portal-tests
+APP_NAME=automation
 TAG=0.0.1
 
 .PHONY: test

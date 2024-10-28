@@ -5,19 +5,17 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 
 from automation.config.settings import Urls
-from automation.tests.ui.pages.unauthenticated import UnauthenticatedPage
-from automation.tests.ui.pages.sign_in import SignInPage
+from automation.tests.ui.pages.authenticated import AuthenticatedPage
 from automation.tests.ui.utils.name_extractor import get_fn_name
 
 lg: Logger = getLogger(__name__)
 
 
-class HomePage(UnauthenticatedPage):
+class HomePage(AuthenticatedPage):
     """The home page"""
 
     locators: dict = {
-        "button_sign_up": (By.ID, "sign_up"),
-        "button_sign_in": (By.ID, "sign_in"),
+        "href_for_chat": (By.CSS_SELECTOR, "#main a"),
     }
 
     def __init__(self, driver: webdriver):
@@ -30,14 +28,6 @@ class HomePage(UnauthenticatedPage):
 
     # Page content
 
-    # def click_create_account_button(self) -> SignUpPage:
-    #     button = self.wait_for(self.locators["button_sign_up"])
-    #     button.click()
-    #     lg.debug(f"TEST {self.__class__.__name__} --- Completed: {get_fn_name()}")
-    #     return SignUpPage(self.driver)
-
-    def click_sign_in_button(self) -> SignInPage:
-        button = self.wait_for(self.locators["button_sign_in"])
-        button.click()
+    def click_chat_href(self) -> None:
+        self.wait_for(self.locators["href_for_chat"]).click()
         lg.debug(f"TEST {self.__class__.__name__} --- Completed: {get_fn_name()}")
-        return SignInPage(self.driver)

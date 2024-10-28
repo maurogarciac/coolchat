@@ -2,13 +2,12 @@ from logging import Logger, getLogger
 
 import pytest
 from _pytest.fixtures import FixtureRequest
+
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as F_Service
 from selenium.webdriver.chrome.service import Service as C_Service
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-
-from automation.tests.ui.utils.randomizer import get_random_string
 
 lg: Logger = getLogger(__name__)
 IMPLICIT_TIMEOUT: float = 3
@@ -26,7 +25,7 @@ def driver(request: FixtureRequest):
             )
         )
     elif (
-        browser == "remote"
+            browser == "remote"
     ):  # Not implemented yet
         capabilities = {"browserName": "firefox", "javascriptEnabled": True}
         _driver = webdriver.Remote(
@@ -63,11 +62,3 @@ def driver(request: FixtureRequest):
     #    su.save_picture(request, _driver)
     #    lg.info(f"Error screenshot saved for {request.node.name}")
     _driver.quit()
-
-@pytest.fixture(autouse=False, scope="function")
-def random_email() -> str:
-    """Generate a random email address
-
-    :returns: Random email string
-    """
-    return f"{get_random_string(7)}@mgc.sh"

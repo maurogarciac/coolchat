@@ -4,7 +4,7 @@ WORKDIR /automation
 COPY . /automation
 
 # Install required packages
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --no-compile --no-cache-dir
 
 # Install Chrome and Firefox
 RUN apt-get update && apt-get install firefox-esr -y

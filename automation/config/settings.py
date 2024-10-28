@@ -10,10 +10,10 @@ lg: Logger = getLogger(__name__)
 class Urls:
     # UI
     LANDING_PAGE: str = os.environ.get("WEB_URL")
-    SIGN_IN_PAGE: str = LANDING_PAGE + "/login"
+    LOG_IN_PAGE: str = LANDING_PAGE + "/login"
     HOME_PAGE: str = LANDING_PAGE + "/home"
     CHAT_PAGE: str = LANDING_PAGE + "/chat"
-    SIGN_OUT: str = LANDING_PAGE + "/logout"
+    LOG_OUT_PAGE: str = LANDING_PAGE + "/logout"
 
     # API
     API: str = os.environ.get("API_URL")
@@ -25,11 +25,11 @@ class Urls:
 
 
 class Users:
-    USER_ALICE: tuple[str, str] = (
-        f"{os.environ.get('USER_ALICE')}",
-        f"{os.environ.get('USER_PASSWORD')}",
-    )
-    USER_BOB: tuple[str, str] = (
-        f"{os.environ.get('USER_BOB')}",
-        f"{os.environ.get('USER_PASSWORD')}",
-    )
+    Alice: dict[str, str] = {
+        "username": f"{os.environ.get('USER_ALICE')}",
+        "password": f"{os.environ.get('USER_PASSWORD')}",
+    }
+    Bob: dict[str, str] = {
+        "username": f"{os.environ.get('USER_BOB')}",
+        "password": f"{os.environ.get('USER_PASSWORD')}",
+    }

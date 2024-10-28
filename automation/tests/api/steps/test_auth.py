@@ -20,7 +20,7 @@ def step_given():
 
 
 # Get auth with valid credentials
-@when(parsers.parse("I send a POST request to /auth with {username} and {password}"),
+@when(parsers.parse("a POST request is sent to /auth with {username} and {password}"),
       converters={"username": str, "password": str})
 def when_valid(response, username: str, password: str):
     res: Response = backend.post_authenticate(username, password)
@@ -44,7 +44,7 @@ def and_valid(response):
 
 
 # Attempt to get auth with invalid request method tests
-@when(parsers.parse("I send a {method} request to /auth"),
+@when(parsers.parse("a {method} request is sent to /auth"),
       converters={"method": str})
 def when_invalid_method(response, method: str):
     res: Response = backend.wrong_method_api_call(backend.Urls.POST_AUTHENTICATE, method=method)
@@ -66,7 +66,7 @@ def and_invalid_method(response):
 
 
 # Attempt to get auth with invalid credentials test
-@when(parsers.parse("I send a POST request to /auth with invalid {username} or {password}"),
+@when(parsers.parse("a POST request is sent to /auth with invalid {username} or {password}"),
       converters={"username": str, "password": str})
 def when_invalid_credentials(response, username: str, password: str):
     res: Response = backend.post_authenticate(username, password)
@@ -88,7 +88,7 @@ def and_invalid_credentials(response):
 
 
 # Attempt to get auth with missing credentials test
-@when(parsers.parse("I send a POST request to /auth with missing {username} or {password}"),
+@when(parsers.parse("a POST request is sent to /auth with missing {username} or {password}"),
       converters={"username": str, "password": str})
 def when_missing_credentials(response, username: str, password: str):
     res: Response = backend.post_authenticate(username, password)

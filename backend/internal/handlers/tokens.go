@@ -165,4 +165,12 @@ var users = []d.User{
 		Username: "alice",
 		Password: "root",
 	},
+	{
+		Username: "test_bob",
+		Password: "test_pw",
+	},
+	{
+		Username: "test_alice",
+		Password: "test_pw",
+	},
 }

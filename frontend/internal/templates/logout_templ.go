@@ -23,7 +23,7 @@ func LogOut() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"logout\"><h1>Log out </h1><h2>Are you sure you want log out? </h2><div><button hx-push-url=\"/chat/\" hx-get=\"/chat?partial=true\" hx-trigger=\"click\" hx-target=\"#main\" hx-swap=\"innerHTML\">No, I want to chat</button> <button hx-post=\"/logout/\" hx-trigger=\"click\" hx-target=\"#main\" hx-swap=\"innerHTML\">Yes</button></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<div id=\"logout\"><h1>Log out </h1><h2>Are you sure you want log out? </h2><div><button id=\"logout-no\" hx-push-url=\"/chat/\" hx-get=\"/chat?partial=true\" hx-trigger=\"click\" hx-target=\"#main\" hx-swap=\"innerHTML\">No, I want to chat</button> <button id=\"logout-yes\" hx-post=\"/logout/\" hx-trigger=\"click\" hx-target=\"#main\" hx-swap=\"innerHTML\">Yes</button></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

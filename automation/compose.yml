@@ -10,4 +10,4 @@ services:
     command:
       - pytest
     env_file:
-      - .env.docker
+      - .env

@@ -33,20 +33,20 @@ templ PageHeaders() {
 templ NavBar(hasToken bool) {
 <div id="nav">
 
-    @NavButton("/home/",  "Home")
-    @NavButton("/chat/",  "Chat App")
+    @NavButton("home",  "Home")
+    @NavButton("chat",  "Chat App")
 
     if hasToken {
-        @NavButton("/logout/",  "Log out")
+        @NavButton("logout",  "Log out")
     } else {
-        @NavButton("/login/", "Log in")
+        @NavButton("login", "Log in")
     }
 
 </div>
 }
 
 templ NavButton(endpoint string, text string){
-<button hx-push-url={ endpoint } hx-get={ endpoint + "?partial=true" } hx-trigger="click" hx-target="#main" hx-swap="innerHTML">
+<button id={ "nav-" + endpoint } hx-push-url={ "/" + endpoint + "/" } hx-get={ "/" + endpoint + "?partial=true" } hx-trigger="click" hx-target="#main" hx-swap="innerHTML">
     { text }
 </button>
 }
@@ -55,6 +55,6 @@ templ Forbidden(){
 <div>
     <h1> Uh oh! </h1>
     <p> Seems like you forgot to Log-in </p>
-    @NavButton("/login/", "Go to log-in")
+    @NavButton("login", "Go to log-in")
 </div>
 }
