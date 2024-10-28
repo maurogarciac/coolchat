@@ -104,8 +104,6 @@ body {
 
 #chatbox {
     text-align: center;
-    justify-content: center;
-    align-items: center;
 
     height: 88%;
     width: 100%;
@@ -129,7 +127,6 @@ body {
     height: 500px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
 }
 
