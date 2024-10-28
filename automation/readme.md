@@ -66,25 +66,14 @@ An optional `--browser` flag can be included after `pytest` to specify the brows
     ```
     (First the file path, then the Class name, and last goes the Test method)
 
-### Test execution environment:
-The execution environment (production, test, development or local) can be changed in the '.env' file on the line:
-```.env
-   ENV='test'
-```
-
-# To do:
-
-1. Implement parallelism (pytest-xdist or pytest-parallel)
-
-
-## Structure: Page Object Model
+## Structure: Page Object Model and BDD
 
 These tests are implemented with the Page Object Model to make them DRY and clean. That means there are modules that
 provide classes to represent each page of the site as a user sees it.
 
 - `tests`: This module defines the test configuration for api and ui in 'conftest.py'.
+- `features`: Contains the feature files, specifying test steps in gherkin syntax.
 - `api`: The api tests, separated by api.
-- `api.models`: Adapters for each api's model.
 - `api.services`: Services to instantiate a connection to each api. 
 - `ui.pages`: This module has a class for each site page and includes methods to access each interactive element.
 - `ui.steps`: This module contains all the tests, separated by page.
