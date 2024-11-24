@@ -3,7 +3,7 @@
 CoolChat is the coolest spot to chat!
 Remember to put on some sunglasses before you connect and start yapping! (background is really white)
 
-![alt text](https://github.com/maurogarciac/coolchat/blob/main/coolchat-preview.png?raw=true)
+![alt text](https://github.com/maurogarciac/coolchat/blob/main/frontend/static/images/coolchat-preview.png?raw=true)
 
 # How to run:
 
