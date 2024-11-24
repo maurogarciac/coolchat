@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 
@@ -118,7 +119,7 @@ func (s *ChatServer) broadcastMessage(message []byte) error {
 		User:      messageContent.User,
 		Timestamp: time.Now(),
 	}
-	if returnMessage.Text != "" {
+	if strings.TrimSpace(returnMessage.Text) != "" {
 		var outgoingEvent Event
 		data, err := json.Marshal(returnMessage)
 		if err != nil {
