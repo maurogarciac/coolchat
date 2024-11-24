@@ -1,26 +1,26 @@
 package templates
 
-templ Layout(content templ.Component, hasToken bool){
-    <!DOCTYPE html>
-    <html lang="es">
-        @PageHeaders()
+templ Layout(content templ.Component, hasToken bool) {
+<!DOCTYPE html>
+<html lang="es">
+    @PageHeaders()
 
-        <body hx-history="false" hx-boost="true" hx-push-url="true">
+    <body hx-history="false" hx-boost="true" hx-push-url="true">
 
-            <a href="#main" class="skip-to-main-content-link">Skip to main content</a>
+        <a href="#main" class="skip-to-main-content-link">Skip to main content</a>
 
-            <!-- Navigation bar -->
+        <!-- Navigation bar -->
 
-            @NavBar(hasToken)
+        @NavBar(hasToken)
 
-            <!-- Page content -->
+        <!-- Page content -->
 
-            <div id="main">
+        <div id="main">
 
-                @content
+            @content
 
-            </div>
+        </div>
 
-        </body>
-    </html>
+    </body>
+</html>
 }

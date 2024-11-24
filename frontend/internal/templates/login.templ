@@ -15,26 +15,26 @@ templ LogIn(has_error bool) {
 }
 
 templ loginInputs(has_error bool) {
-        if has_error {
-        @labelUsername()
-        <input type="text" id="username" name="username" class="error" required></input>
+    if has_error {
+    @labelUsername()
+    <input type="text" id="username" name="username" class="error" required></input>
 
-        @labelPassword()
-        <input type="password" id="password" name="password" class="error" required></input>
-        <div id="error-message">Invalid username or password. Try again.</div>
-        } else {
-        @labelUsername()
-        <input type="text" id="username" name="username" required></input>
+    @labelPassword()
+    <input type="password" id="password" name="password" class="error" required></input>
+    <div id="error-message">Invalid username or password. Try again.</div>
+    } else {
+    @labelUsername()
+    <input type="text" id="username" name="username" required></input>
 
-        @labelPassword()
-        <input type="password" id="password" name="password" required></input>
-        }
+    @labelPassword()
+    <input type="password" id="password" name="password" required></input>
+    }
 }
 
-templ labelUsername(){
+templ labelUsername() {
 <label for="username">Username:</label>
 }
 
-templ labelPassword(){
+templ labelPassword() {
 <label for="password">Password:</label>
 }

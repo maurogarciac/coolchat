@@ -55,7 +55,7 @@ func (s *HTTPServer) Start(ctx context.Context) {
 
 	http.Handle("/", m.AuthRequired(handlers.NewLandingHandler(s.lg), a))
 	http.Handle("/home/", m.AuthRequired(handlers.NewHomeHandler(s.lg), a))
-	http.Handle("/chat/", m.AuthRequired(handlers.NewChatHandler(s.lg, *s.b), a))
+	http.Handle("/chat/", m.AuthRequired(handlers.NewChatHandler(s.lg, *s.b, s.cfg.Ip), a))
 	http.Handle("/login/", handlers.NewLoginHandler(ctx, s.lg, s.b))
 	http.Handle("/logout/", m.AuthRequired(handlers.NewLogoutHandler(s.lg), a))
 

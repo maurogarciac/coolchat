@@ -6,9 +6,9 @@ templ PageHeaders() {
     <meta http-equiv="X-UA-Compatible" content="IE=edge"></meta>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"></meta>
     <title> CoolChat by Mauro Garcia Coto </title>
-    <meta name="description" content="This is just a little chat website"></meta>
+    <meta name="description" content="Just a little chat website"></meta>
     <meta property="og:title" content="CoolChat by Mauro Garcia Coto"></meta>
-    <meta property="og:description" content="This is just a little chat website"></meta>
+    <meta property="og:description" content="Just a little chat website"></meta>
     <base href="/"></base>
     <link rel="stylesheet" href="/static/styles/index.css"></link>
     <link rel="preconnect" href="https://rsms.me/"></link>
@@ -45,13 +45,13 @@ templ NavBar(hasToken bool) {
 </div>
 }
 
-templ NavButton(endpoint string, text string){
+templ NavButton(endpoint string, text string) {
 <button id={ "nav-" + endpoint } hx-push-url={ "/" + endpoint + "/" } hx-get={ "/" + endpoint + "?partial=true" } hx-trigger="click" hx-target="#main" hx-swap="innerHTML">
     { text }
 </button>
 }
 
-templ Forbidden(){
+templ Forbidden() {
 <div>
     <h1> Uh oh! </h1>
     <p> Seems like you forgot to Log-in </p>

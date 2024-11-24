@@ -1,16 +1,16 @@
 package templates
 
-import "fmt"
-import "time"
+import (
+    "fmt"
+    "time"
+    d "frontend/internal/domain"
+)
 
-import d "frontend/internal/domain"
-
-
-templ ChatBox(username string, msgResult d.MessageHistoryResult) {
+templ ChatBox(username string, msgResult d.MessageHistoryResult, serverIp string) {
 
 <div id="chat">
     <h2> CoolChat 😎 </h2>
-    <div id="chatbox-wrapper" hx-ext="ws,ws-html-response" ws-connect="ws://localhost:1337/ws" ws-target="#chatbox" hx-on:htmx:ws-after-message="document.querySelector('#form').reset()">
+    <div id="chatbox-wrapper" hx-ext="ws,ws-html-response" ws-connect={ "ws://" + serverIp + ":1337/ws" } ws-target="#chatbox" hx-on:htmx:ws-after-message="document.querySelector('#form').reset()">
         <div id="chatbox">
             for _, message := range msgResult.Messages {
                 <div id="message-wrapper">

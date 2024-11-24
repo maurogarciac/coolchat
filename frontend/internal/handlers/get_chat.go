@@ -15,12 +15,14 @@ import (
 type ChatHandler struct {
 	lg *zap.SugaredLogger
 	b  services.BackendService
+	ip string
 }
 
-func NewChatHandler(logger *zap.SugaredLogger, backend services.BackendService) *ChatHandler {
+func NewChatHandler(logger *zap.SugaredLogger, backend services.BackendService, serverIp string) *ChatHandler {
 	return &ChatHandler{
 		lg: logger,
 		b:  backend,
+		ip: serverIp,
 	}
 }
 
@@ -51,12 +53,12 @@ func (h ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				Messages: m,
 			}
 
-			c = templates.ChatBox(user, mh)
+			c = templates.ChatBox(user, mh, h.ip)
 
 		} else {
 			h.lg.Debugf("Message history result: %s", messageHistory.Messages)
 
-			c = templates.ChatBox(user, messageHistory)
+			c = templates.ChatBox(user, messageHistory, h.ip)
 
 		}
 		pageRender("chat", c, true, h.lg, w, r)

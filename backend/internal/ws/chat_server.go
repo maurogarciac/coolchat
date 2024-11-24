@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"backend/config"
 	"backend/internal/db"
 	"backend/internal/domain"
 	"encoding/json"
@@ -13,36 +14,22 @@ import (
 	"go.uber.org/zap"
 )
 
-var upgrader = websocket.Upgrader{
-	CheckOrigin:     checkReqOrigin,
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
-func checkReqOrigin(r *http.Request) bool {
-	switch r.Header.Get("Origin") {
-	// Only allow frontend server url to connect
-	case "http://localhost:8000":
-		return true
-	default:
-		return false
-	}
-}
-
 type ChatServer struct {
 	lg      *zap.SugaredLogger
+	cfg     *config.AppConfig
 	clients ClientList
 	sync.RWMutex
 	handlers map[string]EventHandler
 	db       *db.DbProvider
 }
 
-func NewChatServer(logger *zap.SugaredLogger, database *db.DbProvider) *ChatServer {
+func NewChatServer(logger *zap.SugaredLogger, database *db.DbProvider, config *config.AppConfig) *ChatServer {
 	s := &ChatServer{
 		lg:       logger,
 		clients:  make(ClientList),
 		handlers: make(map[string]EventHandler),
 		db:       database,
+		cfg:      config,
 	}
 	s.setupEventHandlers()
 	return s
@@ -58,6 +45,26 @@ func (s *ChatServer) setupEventHandlers() {
 // Handler that allows ws connections
 func (s *ChatServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.lg.Info("New connection")
+
+	upgrader := websocket.Upgrader{
+		ReadBufferSize:  1024,
+		WriteBufferSize: 1024,
+		CheckOrigin: func(r *http.Request) bool {
+			origin := r.Header.Get("Origin")
+			s.lg.Info(origin)
+			switch origin {
+			// Only allow frontend server url to connect
+			case "http://localhost:8000":
+				return true
+			case "http://" + s.cfg.Ip + ":8000":
+				return true
+			case "http://" + s.cfg.Hostname + ":8000":
+				return true
+			default:
+				return false
+			}
+		},
+	}
 
 	conn, err := upgrader.Upgrade(w, r, nil) // Upgrade http connection to ws
 	if err != nil {

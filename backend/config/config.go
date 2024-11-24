@@ -5,6 +5,8 @@ import (
 )
 
 type AppConfig struct {
+	Ip                  string        `env:"SERVER_IP"            envDefault:"localhost"`
+	Hostname            string        `env:"SERVER_HOSTNAME"      envDefault:"localhost"`
 	DbHost              string        `env:"DB_HOST"              envDefault:"localhost"`
 	DbPort              string        `env:"DB_PORT"              envDefault:"5432"`
 	DbUser              string        `env:"DB_USER"              envDefault:""`

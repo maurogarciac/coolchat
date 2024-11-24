@@ -3,6 +3,7 @@ package config
 import "time"
 
 type AppConfig struct {
+	Ip           string        `env:"SERVER_IP"             envDefault:"localhost"`
 	ServerPort   int           `env:"FRONTEND_PORT"         envDefault:"8000"`
 	ReadTimeout  time.Duration `env:"FRONTEND_READ_TIMEOUT" envDefault:"5s"`
 	LogLevel     string        `env:"FRONTEND_LOG_LEVEL"           envDefault:"debug"`
