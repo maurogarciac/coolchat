@@ -1,7 +1,7 @@
 # CoolChat
 
-CoolChat is the coolest spot to chat!
-Remember to put on some sunglasses before you connect and start yapping! (background is really white)
+CoolChat is the coolest spot to chat!  
+Remember to put on some sunglasses before you connect and start yapping! (background is really white)  
 
 ![alt text](https://github.com/maurogarciac/coolchat/blob/main/frontend/static/images/coolchat-preview.png?raw=true)
 
@@ -35,9 +35,11 @@ You can use any of these user credentials to log-in:
 - user:'bob', password:'root'
 - user:'alice', password:'root'
 
-Now you should be able to chat in two different browsers! (Also in different devices in your local network, Phones and tablets included)
+Now you should be able to chat in two different browsers!  
 
-(There is no limit to how many times a user can be logged in, do with that information what you will)
+Also works in different devices in your local network, Phones and tablets included  
+
+(btw there is no limit to how many times a user can be logged in, do with that information what you will)
 
 Have fun!
 
