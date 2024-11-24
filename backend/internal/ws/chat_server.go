@@ -118,29 +118,31 @@ func (s *ChatServer) broadcastMessage(message []byte) error {
 		User:      messageContent.User,
 		Timestamp: time.Now(),
 	}
+	if returnMessage.Text != "" {
+		var outgoingEvent Event
+		data, err := json.Marshal(returnMessage)
+		if err != nil {
+			return fmt.Errorf("failed to marshal broadcast message: %v", err)
+		}
+		outgoingEvent.Message = string(data)
 
-	var outgoingEvent Event
-	data, err := json.Marshal(returnMessage)
-	if err != nil {
-		return fmt.Errorf("failed to marshal broadcast message: %v", err)
-	}
-	outgoingEvent.Message = string(data)
+		msg := domain.InsertMessage{
+			Text: returnMessage.Text,
+			From: returnMessage.User,
+		}
 
-	msg := domain.InsertMessage{
-		Text: returnMessage.Text,
-		From: returnMessage.User,
-	}
+		if s.db == nil {
+			errStr := "could not save message. database connection is not initialized"
+			return fmt.Errorf("%s", errStr)
+		}
+		if _, err := s.db.InsertMessage(msg); err != nil {
+			return fmt.Errorf("failed to insert message: %v", err)
+		}
 
-	if s.db == nil {
-		errStr := "could not save message. database connection is not initialized"
-		return fmt.Errorf("%s", errStr)
+		for client := range s.clients {
+			client.egress <- outgoingEvent // broadcast to egress of all clients
+		}
+		return nil
 	}
-	if _, err := s.db.InsertMessage(msg); err != nil {
-		return fmt.Errorf("failed to insert message: %v", err)
-	}
-
-	for client := range s.clients {
-		client.egress <- outgoingEvent // broadcast to egress of all clients
-	}
-	return nil
+	return fmt.Errorf("message was empty:, %s", returnMessage.Text)
 }
