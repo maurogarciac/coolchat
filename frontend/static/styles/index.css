@@ -56,6 +56,8 @@ body {
     padding-top: 2px;
     background-color: #fff;
     width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 #message {
@@ -63,31 +65,38 @@ body {
     display: flex;
     flex-direction: column;
 
-    width: 90%;
+    width: fit-content;
     height: 99%;
 
     padding: 5px 10px;
 
-    #msg-headers {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        font-size: small;
-    }
+}
 
-    #msg-content {
-        font-size: large;
-        padding: 2px;
-        color: #1e1e1e;
-    }
+#msg-headers {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    font-size: small;
+    min-width: 160px;
+}
 
+#msg-content {
+    font-size: large;
+    padding: 2px;
+    color: #1e1e1e;
+    text-wrap: wrap;
+}
+
+#sent-by {
+    font-weight: bold;
 }
 
 .left {
     background-color: gray;
-    margin-right: 10%;
-    
+    align-self: flex-start;
+    max-width: 90%;
     border-radius: 0 1em 1em 1em;
+
     #msg-content {
         text-align: left; 
     }
@@ -95,8 +104,10 @@ body {
 
 .right {
     background-color: #007bff;
-    margin-left: 10%;
+    align-self: flex-end;
+    max-width: 90%;
     border-radius: 1em 0 1em 1em;
+
     #msg-content {
         text-align: right; 
     }
